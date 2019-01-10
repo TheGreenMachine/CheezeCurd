@@ -1,10 +1,10 @@
 package com.team254.lib.drivers;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.team254.frc2018.subsystems.Subsystem;
+import com.ctre.phoenix.motorcontrol.IMotorControllerEnhanced;
 import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.Timer;
+import frc.team1816.subsystems.Subsystem;
 
 import java.util.ArrayList;
 import java.util.function.DoubleSupplier;
@@ -25,9 +25,9 @@ public class TalonSRXChecker {
 
     public static class TalonSRXConfig {
         public String mName;
-        public TalonSRX mTalon;
+        public IMotorControllerEnhanced mTalon;
 
-        public TalonSRXConfig(String name, TalonSRX talon) {
+        public TalonSRXConfig(String name, IMotorControllerEnhanced talon) {
             mName = name;
             mTalon = talon;
         }
@@ -52,6 +52,7 @@ public class TalonSRXChecker {
 
         // Record previous configuration for all talons.
         for (TalonSRXConfig config : talonsToCheck) {
+            if(config.mTalon.getDeviceID()<0) continue;
             LazyTalonSRX talon = LazyTalonSRX.class.cast(config.mTalon);
 
             StoredTalonSRXConfiguration configuration = new StoredTalonSRXConfiguration();
@@ -66,6 +67,11 @@ public class TalonSRXChecker {
 
         for (TalonSRXConfig config : talonsToCheck) {
             System.out.println("Checking: " + config.mName);
+
+            if(config.mTalon.getDeviceID() <0){
+                System.out.println("Talon Disabled Checks Skipped!!");
+                continue;
+            }
 
             config.mTalon.set(ControlMode.PercentOutput, checkerConfig.mRunOutputPercentage);
             Timer.delay(checkerConfig.mRunTimeSec);
@@ -124,8 +130,11 @@ public class TalonSRXChecker {
 
         // Restore Talon configurations
         for (int i = 0; i < talonsToCheck.size(); ++i) {
-            talonsToCheck.get(i).mTalon.set(storedConfigurations.get(i).mMode,
-                    storedConfigurations.get(i).mSetValue);
+            IMotorControllerEnhanced talon = talonsToCheck.get(i).mTalon;
+            if(talon.getDeviceID() >=0) {
+                talon.set(storedConfigurations.get(i).mMode,
+                        storedConfigurations.get(i).mSetValue);
+            }
         }
 
         return !failure;

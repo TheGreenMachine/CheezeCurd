@@ -57,17 +57,20 @@ public class TalonSRXFactory {
     }
 
     // Create a CANTalon with the default (out of the box) configuration.
-    public static TalonSRX createDefaultTalon(int id) {
+    public static IMotorControllerEnhanced createDefaultTalon(int id) {
         return createTalon(id, kDefaultConfiguration);
     }
 
-    public static TalonSRX createPermanentSlaveTalon(int id, int master_id) {
-        final TalonSRX talon = createTalon(id, kSlaveConfiguration);
+    public static IMotorControllerEnhanced createPermanentSlaveTalon(int id, int master_id) {
+        final IMotorControllerEnhanced talon = createTalon(id, kSlaveConfiguration);
         talon.set(ControlMode.Follower, master_id);
         return talon;
     }
 
-    public static TalonSRX createTalon(int id, Configuration config) {
+    private static IMotorControllerEnhanced createTalon(int id, Configuration config) {
+        if(id == -1){
+            return new GhostTalonSRX();
+        }
         TalonSRX talon = new LazyTalonSRX(id);
         talon.set(ControlMode.PercentOutput, 0.0);
 
