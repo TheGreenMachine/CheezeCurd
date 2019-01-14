@@ -18,8 +18,8 @@ public class Constants {
     /* ROBOT PHYSICAL CONSTANTS */
 
     // Wheels
-    public static final double kDriveWheelTrackWidthInches = 25.54;
-    public static final double kDriveWheelDiameterInches = 3.92820959548 * 0.99;
+    public static final double kDriveWheelTrackWidthInches = 15.75;
+    public static final double kDriveWheelDiameterInches = 3.92820959548;
     public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
     public static final double kTrackScrubFactor = 1.0;  // Tune me!
 
@@ -71,10 +71,10 @@ public class Constants {
 
     // PID gains for drive velocity loop (LOW GEAR)
     // Units: setpoint, error, and output are in ticks per second.
-    public static final double kDriveLowGearVelocityKp = 0.9;
-    public static final double kDriveLowGearVelocityKi = 0.0;
-    public static final double kDriveLowGearVelocityKd = 10.0;
-    public static final double kDriveLowGearVelocityKf = 0.0;
+    public static final double kDriveLowGearVelocityKp = .9;
+    public static final double kDriveLowGearVelocityKi = .0009;
+    public static final double kDriveLowGearVelocityKd = 8.3;
+    public static final double kDriveLowGearVelocityKf = 1.8;
     public static final int kDriveLowGearVelocityIZone = 0;
     public static final double kDriveVoltageRampRate = 0.0;
 
@@ -132,10 +132,10 @@ public class Constants {
     public static final int kLongCANTimeoutMs = 100; //use for constructors
 
     // Drive
-    public static final int kLeftDriveMasterId = 1;
+    public static final int kLeftDriveMasterId = 2;
     public static final int kLeftDriveSlaveAId = -1;
     public static final int kLeftDriveSlaveBId = -1;
-    public static final int kRightDriveMasterId = 2;
+    public static final int kRightDriveMasterId = 1;
     public static final int kRightDriveSlaveAId = -1;
     public static final int kRightDriveSlaveBId = -1;
 
@@ -180,7 +180,7 @@ public class Constants {
     public static final int kDriveGamepadPort = 0;
     public static final int kButtonGamepadPort = 2;
     public static final int kMainThrottleJoystickPort = 0;
-    public static final int kMainTurnJoystickPort = 1;
+    public static final int kMainTurnJoystickPort = 0;
     public static final double kJoystickThreshold = 0.5;
     public static final double kJoystickJogThreshold = 0.4;
 

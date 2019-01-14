@@ -31,7 +31,7 @@ public class Drive extends Subsystem {
 
     private static final int kLowGearVelocityControlSlot = 0;
     private static final int kHighGearVelocityControlSlot = 1;
-    private static final double DRIVE_ENCODER_PPR = 4096.;
+    private static final double DRIVE_ENCODER_PPR = 960;
     private static Drive mInstance = new Drive();
     // Hardware
     private final IMotorControllerEnhanced mLeftMaster, mRightMaster, mLeftSlaveA, mRightSlaveA, mLeftSlaveB, mRightSlaveB;
@@ -93,7 +93,7 @@ public class Drive extends Subsystem {
     private void configureMaster(IMotorControllerEnhanced talon, boolean left) {
         talon.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 5, 100);
         final ErrorCode sensorPresent = talon.configSelectedFeedbackSensor(FeedbackDevice
-                .CTRE_MagEncoder_Relative, 0, 100); //primary closed-loop, 100 ms timeout
+                .QuadEncoder, 0, 100); //primary closed-loop, 100 ms timeout
         if (sensorPresent != ErrorCode.OK) {
             DriverStation.reportError("Could not detect " + (left ? "left" : "right") + " encoder: " + sensorPresent, false);
         }
@@ -174,7 +174,7 @@ public class Drive extends Subsystem {
     }
 
     private static double radiansPerSecondToTicksPer100ms(double rad_s) {
-        return rad_s / (Math.PI * 2.0) * 4096.0 / 10.0;
+        return rad_s / (Math.PI * 2.0) * DRIVE_ENCODER_PPR / 10.0;
     }
 
     @Override
@@ -428,14 +428,14 @@ public class Drive extends Subsystem {
         mPeriodicIO.right_velocity_ticks_per_100ms = mRightMaster.getSelectedSensorVelocity(0);
         mPeriodicIO.gyro_heading = Rotation2d.fromDegrees(mPigeon.getFusedHeading()).rotateBy(mGyroOffset);
 
-        double deltaLeftTicks = ((mPeriodicIO.left_position_ticks - prevLeftTicks) / 4096.0) * Math.PI;
+        double deltaLeftTicks = ((mPeriodicIO.left_position_ticks - prevLeftTicks) / DRIVE_ENCODER_PPR) * Math.PI;
         if (deltaLeftTicks > 0.0) {
             mPeriodicIO.left_distance += deltaLeftTicks * Constants.kDriveWheelDiameterInches;
         } else {
             mPeriodicIO.left_distance += deltaLeftTicks * Constants.kDriveWheelDiameterInches;
         }
 
-        double deltaRightTicks = ((mPeriodicIO.right_position_ticks - prevRightTicks) / 4096.0) * Math.PI;
+        double deltaRightTicks = ((mPeriodicIO.right_position_ticks - prevRightTicks) / DRIVE_ENCODER_PPR) * Math.PI;
         if (deltaRightTicks > 0.0) {
             mPeriodicIO.right_distance += deltaRightTicks * Constants.kDriveWheelDiameterInches;
         } else {
@@ -473,8 +473,8 @@ public class Drive extends Subsystem {
                     }
                 }, new TalonSRXChecker.CheckerConfig() {
                     {
-                        mCurrentFloor = .25;
-                        mRPMFloor = 170;
+                        mCurrentFloor = .1;
+                        mRPMFloor = 160;
                         mCurrentEpsilon = .2;
                         mRPMEpsilon = 20;
                         mRPMSupplier = () -> mLeftMaster.getSelectedSensorVelocity(0);
@@ -489,8 +489,8 @@ public class Drive extends Subsystem {
                     }
                 }, new TalonSRXChecker.CheckerConfig() {
                     {
-                        mCurrentFloor = .25;
-                        mRPMFloor = 170;
+                        mCurrentFloor = .1;
+                        mRPMFloor = 160;
                         mCurrentEpsilon = .2;
                         mRPMEpsilon = 20;
                         mRPMSupplier = () -> mRightMaster.getSelectedSensorVelocity(0);
