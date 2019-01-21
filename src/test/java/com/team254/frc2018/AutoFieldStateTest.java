@@ -1,5 +1,6 @@
 package com.team254.frc2018;
 
+import frc.team1816.AutoFieldState;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

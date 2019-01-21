@@ -1,8 +1,9 @@
 package com.team254.frc2018.planners;
 
-import com.team254.frc2018.states.SuperstructureConstants;
-import com.team254.frc2018.states.SuperstructureState;
 import com.team254.util.test.ControlledActuatorLinearSim;
+import frc.team1816.planners.SuperstructureMotionPlanner;
+import frc.team1816.states.SuperstructureConstants;
+import frc.team1816.states.SuperstructureState;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

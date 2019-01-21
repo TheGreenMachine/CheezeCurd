@@ -144,7 +144,7 @@ public class SuperstructureMotionPlanner {
         return true; // this is a legal move
     }
 
-    void reset(SuperstructureState currentState) {
+    public void reset(SuperstructureState currentState) {
         mIntermediateCommandState = currentState;
         mCommandQueue.clear();
         mCurrentCommand = Optional.empty();
