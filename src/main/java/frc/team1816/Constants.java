@@ -71,11 +71,11 @@ public class Constants {
 
     // PID gains for drive velocity loop (LOW GEAR)
     // Units: setpoint, error, and output are in ticks per second.
-    public static final double kDriveLowGearVelocityKp = .9;
-    public static final double kDriveLowGearVelocityKi = .0009;
-    public static final double kDriveLowGearVelocityKd = 8.3;
-    public static final double kDriveLowGearVelocityKf = 1.8;
-    public static final int kDriveLowGearVelocityIZone = 0;
+    public static final double kDriveLowGearVelocityKp = 2;
+    public static final double kDriveLowGearVelocityKi = .001;
+    public static final double kDriveLowGearVelocityKd = 10;
+    public static final double kDriveLowGearVelocityKf = 1.85;
+    public static final int kDriveLowGearVelocityIZone = 10;
     public static final double kDriveVoltageRampRate = 0.0;
 
     // PID gains for elevator velocity loop (HIGH GEAR)

@@ -13,12 +13,13 @@ public class LivingRoomMode extends AutoModeBase {
 
     public  LivingRoomMode(){
         var trajectory = mTrajectoryGenerator.getTrajectorySet().centerStartToStairs;
+        System.out.println(trajectory.toString());
         mDriveToStairs = new DriveTrajectory(trajectory,true);
     }
 
     @Override
     protected void routine() throws AutoModeEndedException {
-        runAction(new WaitAction(2.0));
+        runAction(new WaitAction(.5));
         runAction(mDriveToStairs);
     }
 

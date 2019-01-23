@@ -18,7 +18,7 @@ import java.util.List;
 public class TrajectoryGenerator {
     // velocities are in/sec
     private static final double kMaxVelocity = 38;
-    private static final double kMaxAccel = 200.0;
+    private static final double kMaxAccel = 76;
     private static final double kMaxCentripetalAccelElevatorDown = 110.0;
     private static final double kMaxCentripetalAccel = 100.0;
     private static final double kMaxVoltage = 9.0;
@@ -82,9 +82,9 @@ public class TrajectoryGenerator {
     // +y is to the left.
     // ALL POSES DEFINED FOR THE CASE THAT ROBOT STARTS ON RIGHT! (mirrored about +x axis for LEFT)
 
-    public static final Pose2d kMiddleWalkway = new Pose2d(79.5,11.0,Rotation2d.fromDegrees(225.0));
+    public static final Pose2d kMiddleWalkway = new Pose2d(new Translation2d(79.5,11.0),Rotation2d.fromDegrees(225.0));
     public static final Pose2d kStraight  = new Pose2d( 60.0,0, Rotation2d.fromDegrees(180));
-    public static final Pose2d kStairs = new Pose2d(176,36,Rotation2d.fromDegrees(180.0));
+    public static final Pose2d kStairs = new Pose2d(new Translation2d(176,36),Rotation2d.fromDegrees(180.0));
     public static final Pose2d kSideStartPose = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(180.0));
     public static final Pose2d kNearScaleEmptyPose = new Pose2d(new Translation2d(253.0, 28.0), Rotation2d
             .fromDegrees(10 + 180.0));
@@ -421,8 +421,8 @@ public class TrajectoryGenerator {
         private Trajectory<TimedState<Pose2dWithCurvature>> getCenterStartToStairs() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(kCenterStartPose);
-            waypoints.add(kStraight);
-            //waypoints.add(kStairs);
+            waypoints.add(kMiddleWalkway);
+            waypoints.add(kStairs);
             return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
                     kMaxVelocity, kMaxAccel, kMaxVoltage);
         }

@@ -1,5 +1,6 @@
 package frc.team1816;
 
+import badlog.lib.BadLog;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.util.*;
 import edu.wpi.first.wpilibj.*;
@@ -13,7 +14,9 @@ import frc.team1816.statemachines.SuperstructureStateMachine;
 import frc.team1816.states.SuperstructureConstants;
 import frc.team1816.subsystems.*;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Optional;
 
 public class Robot extends TimedRobot {
@@ -24,6 +27,7 @@ public class Robot extends TimedRobot {
     private AutoFieldState mAutoFieldState = AutoFieldState.getInstance();
     private TrajectoryGenerator mTrajectoryGenerator = TrajectoryGenerator.getInstance();
     private AutoModeSelector mAutoModeSelector = new AutoModeSelector();
+    private BadLog logger;
 
     private final SubsystemManager mSubsystemManager = new SubsystemManager(
             Arrays.asList(
@@ -79,6 +83,24 @@ public class Robot extends TimedRobot {
     @Override
     public void robotInit() {
         try {
+            var logFile = new SimpleDateFormat("DDDHHmm").format(new Date());
+            logger = BadLog.init("/home/lvuser/" + logFile + ".bag");
+            BadLog.createValue("kF", String.valueOf(Constants.kDriveLowGearVelocityKf));
+            BadLog.createValue("kP", String.valueOf(Constants.kDriveLowGearVelocityKp));
+            BadLog.createValue("kD", String.valueOf(Constants.kDriveLowGearVelocityKd));
+            BadLog.createValue("kI", String.valueOf(Constants.kDriveLowGearVelocityKi));
+            BadLog.createValue("iZone", String.valueOf(Constants.kDriveLowGearVelocityIZone));
+            BadLog.createTopic("Drivetrain/LeftVel", "NativeUnits", mDrive::getLeftVelocityNativeUnits, "hide", "join:Drivetrain/Velocities");
+            BadLog.createTopic("Drivetrain/RightVel", "NativeUnits", mDrive::getRightVelocityNativeUnits, "hide", "join:Drivetrain/Velocities");
+            BadLog.createTopic("Drivetrain/LeftActVel", "NativeUnits",   mDrive::getLeftVelocityDemand, "hide", "join:Drivetrain/Velocities");
+            BadLog.createTopic("Drivetrain/RightActVel", "NativeUnits", mDrive::getRightVelocityDemand, "hide", "join:Drivetrain/Velocities");
+            BadLog.createTopic("Drivetrain/LeftError", "NativeUnits",  mDrive::getLeftError, "hide", "join:Drivetrain/VelocityError");
+            BadLog.createTopic("Drivetrain/RightError", "NativeUnits", mDrive::getRightError, "hide", "join:Drivetrain/VelocityError");
+            BadLog.createTopic("Drivetrain/LeftDistance", "Inches",  mDrive::getLeftEncoderDistance, "hide", "join:Drivetrain/Distance");
+            BadLog.createTopic("Drivetrain/RightDistance", "Inches", mDrive::getRightEncoderDistance, "hide", "join:Drivetrain/Distance");
+            BadLog.createTopic("Drivetrain/ActualHeading", "Angle", mDrive::getHeadingDegrees, "hide", "join:Drivetrain/Heading");
+            BadLog.createTopic("Drivetrain/Heading", "Angle", mDrive::getDesiredHeading, "hide", "join:Drivetrain/Heading");
+            logger.finishInitialization();
             //init camera stream
             //UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
             //camera.setVideoMode(VideoMode.PixelFormat.kMJPEG, 320, 240, 15);
@@ -600,6 +622,8 @@ public class Robot extends TimedRobot {
         mEnabledLooper.outputToSmartDashboard();
         mAutoModeSelector.outputToSmartDashboard();
         mCheesyVision2.outputTelemetry();
+        logger.updateTopics();
+        logger.log();
         // SmartDashboard.updateValues();
     }
 }

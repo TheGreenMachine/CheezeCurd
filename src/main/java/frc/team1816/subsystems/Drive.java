@@ -1,5 +1,6 @@
 package frc.team1816.subsystems;
 
+import badlog.lib.BadLog;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -151,6 +152,7 @@ public class Drive extends Subsystem {
         setBrakeMode(false);
 
         mMotionPlanner = new DriveMotionPlanner();
+
     }
 
     public static Drive getInstance() {
@@ -272,6 +274,14 @@ public class Drive extends Subsystem {
         return mPeriodicIO.gyro_heading;
     }
 
+    public double getHeadingDegrees(){
+        return mPeriodicIO.gyro_heading.getDegrees();
+    }
+
+    public double getDesiredHeading(){
+        return mPeriodicIO.path_setpoint.state().getRotation().getDegrees();
+    }
+
     public synchronized void setHeading(Rotation2d heading) {
         System.out.println("SET HEADING: " + heading.getDegrees());
 
@@ -345,6 +355,30 @@ public class Drive extends Subsystem {
 
     public double getLeftVelocityNativeUnits() {
         return mPeriodicIO.left_velocity_ticks_per_100ms;
+    }
+
+    public double getLeftVelocityDemand() {
+        return mPeriodicIO.left_demand;
+    }
+
+    public double getRightVelocityDemand() {
+        return mPeriodicIO.right_demand;
+    }
+
+    public double getLeftError(){
+        return mPeriodicIO.left_error;
+    }
+
+    public double getRightError(){
+        return mPeriodicIO.right_error;
+    }
+
+    public double getLeftFF(){
+        return mPeriodicIO.left_feedforward;
+    }
+
+    public double getRightFF(){
+        return mPeriodicIO.right_feedforward;
     }
 
     public double getLeftLinearVelocity() {
@@ -427,6 +461,8 @@ public class Drive extends Subsystem {
         mPeriodicIO.left_velocity_ticks_per_100ms = mLeftMaster.getSelectedSensorVelocity(0);
         mPeriodicIO.right_velocity_ticks_per_100ms = mRightMaster.getSelectedSensorVelocity(0);
         mPeriodicIO.gyro_heading = Rotation2d.fromDegrees(mPigeon.getFusedHeading()).rotateBy(mGyroOffset);
+        mPeriodicIO.left_error = mLeftMaster.getClosedLoopError(0);
+        mPeriodicIO.right_error = mRightMaster.getClosedLoopError(0);
 
         double deltaLeftTicks = ((mPeriodicIO.left_position_ticks - prevLeftTicks) / DRIVE_ENCODER_PPR) * Math.PI;
         if (deltaLeftTicks > 0.0) {
@@ -534,6 +570,8 @@ public class Drive extends Subsystem {
         public int right_velocity_ticks_per_100ms;
         public Rotation2d gyro_heading = Rotation2d.identity();
         public Pose2d error = Pose2d.identity();
+        public double left_error;
+        public double right_error;
 
         // OUTPUTS
         public double left_demand;
