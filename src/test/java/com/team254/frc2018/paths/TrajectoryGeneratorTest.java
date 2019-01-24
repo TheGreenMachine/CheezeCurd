@@ -4,6 +4,7 @@ import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Pose2dWithCurvature;
 import com.team254.lib.geometry.Twist2d;
 import com.team254.lib.trajectory.TimedView;
+import com.team254.lib.trajectory.Trajectory;
 import com.team254.lib.trajectory.TrajectoryIterator;
 import com.team254.lib.trajectory.timing.TimedState;
 import com.team254.lib.util.Util;
@@ -14,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TrajectoryGeneratorTest {
+
     public static final double kTestEpsilon = 1e-5;
 
     public void verifyMirroredTrajectories(final TrajectoryGenerator.TrajectorySet.MirroredTrajectory mirrored,
@@ -91,22 +93,69 @@ public class TrajectoryGeneratorTest {
     @Test
     public void test() {
         TrajectoryGenerator.getInstance().generateTrajectories();
+        var ts = TrajectoryGenerator.getInstance().getTrajectorySet();
+        System.out.println(ts.centerStartToStairs.toString());
+        verifyTrajectory(ts.centerStartToStairs, true);
+        verifyMirroredTrajectories(ts.sideStartToFarScale, true);
+        verifyMirroredTrajectories(ts.sideStartToFarSwitch, true);
+        verifyMirroredTrajectories(ts.sideStartToNearScale, true);
+        verifyMirroredTrajectories(ts.sideStartToNearSwitch, true);
 
-        verifyMirroredTrajectories(TrajectoryGenerator.getInstance().getTrajectorySet().sideStartToFarScale, true);
-        verifyMirroredTrajectories(TrajectoryGenerator.getInstance().getTrajectorySet().sideStartToFarSwitch, true);
-        verifyMirroredTrajectories(TrajectoryGenerator.getInstance().getTrajectorySet().sideStartToNearScale, true);
-        verifyMirroredTrajectories(TrajectoryGenerator.getInstance().getTrajectorySet().sideStartToNearSwitch, true);
+        //verifyMirroredTrajectories(ts.nearScaleToNearFence, false);
+        verifyMirroredTrajectories(ts.nearScaleToNearFence2, false);
 
-        verifyMirroredTrajectories(TrajectoryGenerator.getInstance().getTrajectorySet().nearScaleToNearFence, false);
-        verifyMirroredTrajectories(TrajectoryGenerator.getInstance().getTrajectorySet().nearScaleToNearFence2, false);
+        verifyMirroredTrajectories(ts.farScaleToFarFence, false);
+        verifyMirroredTrajectories(ts.farScaleToFarFence2, false);
 
-        verifyMirroredTrajectories(TrajectoryGenerator.getInstance().getTrajectorySet().farScaleToFarFence, false);
-        verifyMirroredTrajectories(TrajectoryGenerator.getInstance().getTrajectorySet().farScaleToFarFence2, false);
+        verifyMirroredTrajectories(ts.nearFenceToNearScale, true);
+        verifyMirroredTrajectories(ts.nearFence2ToNearScale, true);
 
-        verifyMirroredTrajectories(TrajectoryGenerator.getInstance().getTrajectorySet().nearFenceToNearScale, true);
-        verifyMirroredTrajectories(TrajectoryGenerator.getInstance().getTrajectorySet().nearFence2ToNearScale, true);
+        verifyMirroredTrajectories(ts.farFenceToFarScale, true);
+        verifyMirroredTrajectories(ts.farFence2ToFarScale, true);
+    }
 
-        verifyMirroredTrajectories(TrajectoryGenerator.getInstance().getTrajectorySet().farFenceToFarScale, true);
-        verifyMirroredTrajectories(TrajectoryGenerator.getInstance().getTrajectorySet().farFence2ToFarScale, true);
+    private void verifyTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> trajectory, boolean shouldBeReversed) {
+
+        var iterator = new TrajectoryIterator<>(new TimedView<>(trajectory));
+
+        final double dt = 0.05;
+        TimedState<Pose2dWithCurvature> prev_left = null;
+        while (!iterator.isDone()) {
+            TimedState<Pose2dWithCurvature> left_state = iterator.getState();
+
+
+            assertTrue((shouldBeReversed ? -1.0 : 1.0) * left_state.velocity() >= -kTestEpsilon);
+
+            if (prev_left != null) {
+                // Check there are no angle discontinuities.
+                final double kMaxReasonableChangeInAngle = 0.3;  // rad
+                Twist2d left_change = Pose2d.log(prev_left.state().getPose().inverse().transformBy(left_state.state()
+                        .getPose()));
+
+                assertTrue(Math.abs(left_change.dtheta) < kMaxReasonableChangeInAngle);
+
+                if (!Util.epsilonEquals(left_change.dtheta, 0.0)) {
+                    // Could be a curvature sign change between prev and now, so just check that either matches our
+                    // expected sign.
+                    final boolean left_curvature_positive = left_state.state().getCurvature() > kTestEpsilon ||
+                            prev_left.state().getCurvature() > kTestEpsilon;
+                    final boolean left_curvature_negative = left_state.state().getCurvature() < -kTestEpsilon ||
+                            prev_left.state().getCurvature() < -kTestEpsilon;
+
+                    final double actual_left_curvature = left_change.dtheta / left_change.dx;
+
+                    if (actual_left_curvature < -kTestEpsilon) {
+                        assertTrue(left_curvature_negative);
+                    } else if (actual_left_curvature > kTestEpsilon) {
+                        assertTrue(left_curvature_positive);
+                    }
+
+                }
+            }
+
+            iterator.advance(dt);
+            prev_left = left_state;
+        }
+
     }
 }

@@ -275,11 +275,11 @@ public class Drive extends Subsystem {
     }
 
     public double getHeadingDegrees(){
-        return mPeriodicIO.gyro_heading.getDegrees();
+        return getHeading().getDegrees();
     }
 
     public double getDesiredHeading(){
-        return mPeriodicIO.path_setpoint.state().getRotation().getDegrees();
+        return mPeriodicIO.path_setpoint.state().getRotation().rotateBy(mGyroOffset).getDegrees();
     }
 
     public synchronized void setHeading(Rotation2d heading) {
