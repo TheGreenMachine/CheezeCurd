@@ -6,20 +6,18 @@ import frc.team1816.auto.actions.DriveTrajectory;
 import frc.team1816.auto.actions.WaitAction;
 import frc.team1816.paths.TrajectoryGenerator;
 
-public class LivingRoomMode extends AutoModeBase {
-
+public class ShopMode extends AutoModeBase {
     private static final TrajectoryGenerator mTrajectoryGenerator = TrajectoryGenerator.getInstance();
-    private DriveTrajectory mDriveToStairs;
+    private DriveTrajectory mDriveToVex;
 
-    public  LivingRoomMode(){
-        var trajectory = mTrajectoryGenerator.getTrajectorySet().centerStartToStairs;
-        mDriveToStairs = new DriveTrajectory(trajectory,true);
+    public  ShopMode(){
+        var trajectory = mTrajectoryGenerator.getTrajectorySet().centerStartToVex;
+        mDriveToVex = new DriveTrajectory(trajectory,true);
     }
 
     @Override
     protected void routine() throws AutoModeEndedException {
         runAction(new WaitAction(.5));
-        runAction(mDriveToStairs);
+        runAction(mDriveToVex);
     }
-
 }

@@ -5,6 +5,7 @@ import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import com.team254.lib.drivers.ISolenoid;
 import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.drivers.TalonSRXFactory;
@@ -99,7 +100,7 @@ public class Drive extends Subsystem {
             DriverStation.reportError("Could not detect " + (left ? "left" : "right") + " encoder: " + sensorPresent, false);
         }
         talon.setInverted(left);
-        talon.setSensorPhase(false);
+        talon.setSensorPhase(true);
         talon.enableVoltageCompensation(true);
         talon.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
         talon.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_50Ms, Constants.kLongCANTimeoutMs);
@@ -139,7 +140,7 @@ public class Drive extends Subsystem {
         reloadGains();
 
         mPigeon = new PigeonIMU(kPigeon);
-        mLeftSlaveB.setStatusFramePeriod(StatusFrameEnhanced.Status_11_UartGadgeteer, 10, 10);
+        mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR,10,10);
 
         // Force a solenoid message.
         mIsHighGear = true;
@@ -275,7 +276,7 @@ public class Drive extends Subsystem {
     }
 
     public double getHeadingDegrees(){
-        return getHeading().getDegrees();
+        return getHeading().rotateBy(mGyroOffset).getDegrees();
     }
 
     public double getDesiredHeading(){

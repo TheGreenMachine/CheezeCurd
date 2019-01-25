@@ -82,9 +82,14 @@ public class TrajectoryGenerator {
     // +y is to the left.
     // ALL POSES DEFINED FOR THE CASE THAT ROBOT STARTS ON RIGHT! (mirrored about +x axis for LEFT)
 
-    public static final Pose2d kMiddleWalkway = new Pose2d(new Translation2d(79.5,11.0),Rotation2d.fromDegrees(225.0));
+    // shop
+    public static final Pose2d kShop1 = new Pose2d(74,-36,Rotation2d.fromDegrees(180-45));
+    public static final Pose2d kShop2 = new Pose2d(114,-126,Rotation2d.fromDegrees(180-22));
+    public static final Pose2d kVexBox = new Pose2d(198,-150,Rotation2d.fromDegrees(180));
+
+    public static final Pose2d kMiddleWalkway = new Pose2d(79.5,11.0,Rotation2d.fromDegrees(180+45));
     public static final Pose2d kStraight  = new Pose2d( 60.0,0, Rotation2d.fromDegrees(180));
-    public static final Pose2d kStairs = new Pose2d(new Translation2d(176,36),Rotation2d.fromDegrees(180.0));
+    public static final Pose2d kStairs = new Pose2d(176,36,Rotation2d.fromDegrees(180));
     public static final Pose2d kSideStartPose = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(180.0));
     public static final Pose2d kNearScaleEmptyPose = new Pose2d(new Translation2d(253.0, 28.0), Rotation2d
             .fromDegrees(10 + 180.0));
@@ -155,6 +160,7 @@ public class TrajectoryGenerator {
     public static final Pose2d kFence1PoseRight = kCube1PoseRight.transformBy(kCenterToIntake);
 
     public class TrajectorySet {
+
         public class MirroredTrajectory {
             public MirroredTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> right) {
                 this.right = right;
@@ -192,6 +198,7 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> simpleStartToLeftSwitch;
         public final Trajectory<TimedState<Pose2dWithCurvature>> simpleStartToRightSwitch;
         public final Trajectory<TimedState<Pose2dWithCurvature>> centerStartToStairs;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> centerStartToVex;
         public final MirroredTrajectory switchToPyramidCube;
         public final MirroredTrajectory pyramidCubeToSwitch;
         public final MirroredTrajectory switchToPyramidCube1;
@@ -248,6 +255,7 @@ public class TrajectoryGenerator {
             fenceToScaleRight = new MirroredTrajectory(getFenceToScaleRight());
 
             centerStartToStairs = getCenterStartToStairs();
+            centerStartToVex = getCenterStartToVex();
 
         }
 
@@ -423,6 +431,16 @@ public class TrajectoryGenerator {
             waypoints.add(kCenterStartPose);
             waypoints.add(kMiddleWalkway);
             waypoints.add(kStairs);
+            return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
+                    kMaxVelocity, kMaxAccel, kMaxVoltage);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getCenterStartToVex() {
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(kCenterStartPose);
+            waypoints.add(kShop1);
+            waypoints.add(kShop2);
+            waypoints.add(kVexBox);
             return generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
                     kMaxVelocity, kMaxAccel, kMaxVoltage);
         }

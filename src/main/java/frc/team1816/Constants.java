@@ -132,10 +132,10 @@ public class Constants {
     public static final int kLongCANTimeoutMs = 100; //use for constructors
 
     // Drive
-    public static final int kLeftDriveMasterId = 2;
+    public static final int kLeftDriveMasterId = 1;
     public static final int kLeftDriveSlaveAId = -1;
     public static final int kLeftDriveSlaveBId = -1;
-    public static final int kRightDriveMasterId = 1;
+    public static final int kRightDriveMasterId = 2;
     public static final int kRightDriveSlaveAId = -1;
     public static final int kRightDriveSlaveBId = -1;
 

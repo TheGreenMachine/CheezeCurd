@@ -34,6 +34,7 @@ public class AutoModeSelector {
         SCALE_AND_SWITCH,
         ONLY_SCALE,
         LIVING_ROOM,
+        SHOP,
         ADVANCED, // This uses 4 additional sendable choosers to pick one for each field state combo
     }
 
@@ -59,6 +60,7 @@ public class AutoModeSelector {
         mModeChooser.addObject("Scale AND Switch", DesiredMode.SCALE_AND_SWITCH);
         mModeChooser.addObject("Only Scale", DesiredMode.ONLY_SCALE);
         mModeChooser.addObject("Living Room",DesiredMode.LIVING_ROOM);
+        mModeChooser.addObject("Shop", DesiredMode.SHOP);
         SmartDashboard.putData("Auto mode", mModeChooser);
 
         mStartPositionChooser = new SendableChooser<>();
@@ -108,6 +110,8 @@ public class AutoModeSelector {
                 return Optional.of(new ScaleOnlyAutoModeCreator(startOnLeft));
             case LIVING_ROOM:
                 return  Optional.of(new LivingRoomModeCreator());
+            case SHOP:
+                return Optional.of(new ShopModeCreator());
             default:
                 break;
         }
