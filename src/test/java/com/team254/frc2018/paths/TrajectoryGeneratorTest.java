@@ -96,22 +96,6 @@ public class TrajectoryGeneratorTest {
         var ts = TrajectoryGenerator.getInstance().getTrajectorySet();
         System.out.println(ts.centerStartToStairs.toString());
         verifyTrajectory(ts.centerStartToStairs, true);
-        verifyMirroredTrajectories(ts.sideStartToFarScale, true);
-        verifyMirroredTrajectories(ts.sideStartToFarSwitch, true);
-        verifyMirroredTrajectories(ts.sideStartToNearScale, true);
-        verifyMirroredTrajectories(ts.sideStartToNearSwitch, true);
-
-        //verifyMirroredTrajectories(ts.nearScaleToNearFence, false);
-        verifyMirroredTrajectories(ts.nearScaleToNearFence2, false);
-
-        verifyMirroredTrajectories(ts.farScaleToFarFence, false);
-        verifyMirroredTrajectories(ts.farScaleToFarFence2, false);
-
-        verifyMirroredTrajectories(ts.nearFenceToNearScale, true);
-        verifyMirroredTrajectories(ts.nearFence2ToNearScale, true);
-
-        verifyMirroredTrajectories(ts.farFenceToFarScale, true);
-        verifyMirroredTrajectories(ts.farFence2ToFarScale, true);
     }
 
     private void verifyTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> trajectory, boolean shouldBeReversed) {
