@@ -1,7 +1,6 @@
 package frc.team1816.controlboard;
 
 import edu.wpi.first.wpilibj.Joystick;
-import frc.team1816.Constants;
 
 public class MainDriveControlBoard implements IDriveControlBoard {
     private static MainDriveControlBoard mInstance = null;
@@ -17,8 +16,8 @@ public class MainDriveControlBoard implements IDriveControlBoard {
     private final Joystick mTurnStick;
 
     private MainDriveControlBoard() {
-        mThrottleStick = new Joystick(Constants.kMainThrottleJoystickPort);
-        mTurnStick = new Joystick(Constants.kMainTurnJoystickPort);
+        mThrottleStick = new Joystick(0);
+        mTurnStick = new Joystick(0);
     }
 
     @Override
@@ -32,22 +31,8 @@ public class MainDriveControlBoard implements IDriveControlBoard {
     }
 
     @Override
-    public boolean getPoopyShoot() {
-        return mThrottleStick.getRawButton(1);
-    }
-
-    @Override
     public boolean getQuickTurn() {
         return mTurnStick.getRawButton(1);
     }
 
-    @Override
-    public boolean getOpenJaw() {
-        return mTurnStick.getRawButton(2);
-    }
-
-    @Override
-    public boolean getShoot() {
-        return mThrottleStick.getRawButton(2);
-    }
 }

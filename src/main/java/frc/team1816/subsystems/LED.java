@@ -17,9 +17,6 @@ public class LED extends Subsystem {
     private SystemState mSystemState = SystemState.DISPLAYING_INTAKE;
     private WantedAction mWantedAction = WantedAction.DISPLAY_INTAKE;
 
-    private Wrist mWrist;
-    private Elevator mElevator;
-
     private boolean mFaultsEnabled = false;
 
     private LEDState mDesiredLEDState = new LEDState(0.0, 0.0, 0.0);
@@ -36,10 +33,6 @@ public class LED extends Subsystem {
         mCarriageCanifier = CarriageCanifier.getInstance();
     }
 
-    public synchronized void setIntakeLEDState(TimedLEDState intakeLEDState) {
-        mIntakeLEDState = intakeLEDState;
-    }
-
     public synchronized void setWantedAction(WantedAction wantedAction) {
         mWantedAction = wantedAction;
     }
@@ -52,8 +45,6 @@ public class LED extends Subsystem {
             @Override
             public void onStart(double timestamp) {
                 stateStartTime = timestamp;
-                mWrist = Wrist.getInstance();
-                mElevator = Elevator.getInstance();
             }
 
             @Override
@@ -130,7 +121,7 @@ public class LED extends Subsystem {
     }
 
     private SystemState getStateTransition() {
-        if (mFaultsEnabled && (!mWrist.hasBeenZeroed() || !mElevator.hasBeenZeroed())) {
+        if (mFaultsEnabled) {
             return SystemState.DISPLAYING_FAULT;
         }
         switch (mWantedAction) {
@@ -151,7 +142,7 @@ public class LED extends Subsystem {
     }
 
     @Override
-    public boolean checkSystem() {
+    public void checkSystem() {
         mCarriageCanifier.setLEDColor(1.0, 0, 0);
         mCarriageCanifier.writePeriodicOutputs();
         Timer.delay(1);
@@ -163,7 +154,6 @@ public class LED extends Subsystem {
         Timer.delay(1);
         mCarriageCanifier.setLEDColor(0, 0, 0);
         mCarriageCanifier.writePeriodicOutputs();
-        return false;
     }
 
     @Override

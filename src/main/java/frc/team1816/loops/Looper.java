@@ -14,7 +14,6 @@ import java.util.List;
  * powers up and stopped after the match.
  */
 public class Looper implements ILooper {
-    private final double kPeriod = Constants.kLooperDt;
 
     private boolean running_;
 
@@ -24,25 +23,24 @@ public class Looper implements ILooper {
     private double timestamp_ = 0;
     private double dt_ = 0;
 
-    private final CrashTrackingRunnable runnable_ = new CrashTrackingRunnable() {
-        @Override
-        public void runCrashTracked() {
-            synchronized (taskRunningLock_) {
-                if (running_) {
-                    double now = Timer.getFPGATimestamp();
+    public Looper() {
+        CrashTrackingRunnable runnable_ = new CrashTrackingRunnable() {
+            @Override
+            public void runCrashTracked() {
+                synchronized (taskRunningLock_) {
+                    if (running_) {
+                        double now = Timer.getFPGATimestamp();
 
-                    for (Loop loop : loops_) {
-                        loop.onLoop(now);
+                        for (Loop loop : loops_) {
+                            loop.onLoop(now);
+                        }
+
+                        dt_ = now - timestamp_;
+                        timestamp_ = now;
                     }
-
-                    dt_ = now - timestamp_;
-                    timestamp_ = now;
                 }
             }
-        }
-    };
-
-    public Looper() {
+        };
         notifier_ = new Notifier(runnable_);
         running_ = false;
         loops_ = new ArrayList<>();
@@ -65,6 +63,7 @@ public class Looper implements ILooper {
                 }
                 running_ = true;
             }
+            double kPeriod = Constants.kLooperDt;
             notifier_.startPeriodic(kPeriod);
         }
     }

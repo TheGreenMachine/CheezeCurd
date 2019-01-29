@@ -8,12 +8,11 @@ import frc.team1816.auto.actions.Action;
  * routines that do actions).
  */
 public abstract class AutoModeBase {
-    protected double mUpdateRate = 1.0 / 50.0;
-    protected boolean mActive = false;
+    private boolean mActive = false;
 
     protected abstract void routine() throws AutoModeEndedException;
 
-    public void run() {
+    void run() {
         mActive = true;
 
         try {
@@ -26,7 +25,7 @@ public abstract class AutoModeBase {
         done();
     }
 
-    public void done() {
+    private void done() {
         System.out.println("Auto mode done");
     }
 
@@ -34,16 +33,15 @@ public abstract class AutoModeBase {
         mActive = false;
     }
 
-    public boolean isActive() {
+    private boolean isActive() {
         return mActive;
     }
 
-    public boolean isActiveWithThrow() throws AutoModeEndedException {
+    private boolean isActiveWithThrow() throws AutoModeEndedException {
         if (!isActive()) {
             throw new AutoModeEndedException();
         }
-
-        return isActive();
+        return true;
     }
 
     public void runAction(Action action) throws AutoModeEndedException {
@@ -52,6 +50,7 @@ public abstract class AutoModeBase {
 
         while (isActiveWithThrow() && !action.isFinished()) {
             action.update();
+            double mUpdateRate = 1.0 / 50.0;
             long waitTime = (long) (mUpdateRate * 1000.0);
 
             try {

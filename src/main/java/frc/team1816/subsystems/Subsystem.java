@@ -26,7 +26,7 @@ public abstract class Subsystem {
     public void writePeriodicOutputs() {
     }
 
-    public abstract boolean checkSystem();
+    public abstract void checkSystem();
 
     public abstract void outputTelemetry();
 

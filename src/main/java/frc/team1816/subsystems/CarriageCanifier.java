@@ -4,13 +4,12 @@ import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifierStatusFrame;
 import frc.team1816.Constants;
 
-
 public class CarriageCanifier extends Subsystem {
     private static CarriageCanifier mInstance;
     private CANifier mCanifier;
     private PeriodicInputs mPeriodicInputs;
     private PeriodicOutputs mPeriodicOutputs;
-    private boolean mOutputsChanged = true;
+    private boolean mOutputsChanged;
 
     private CarriageCanifier() {
         mCanifier = new CANifier(Constants.kCanifierId);
@@ -32,31 +31,7 @@ public class CarriageCanifier extends Subsystem {
         return mInstance;
     }
 
-    public int getWristTicks() {
-        return mCanifier.getQuadraturePosition();
-    }
-
-    public synchronized boolean getLeftBannerSensor() {
-        return mPeriodicInputs.left_sensor_state_;
-    }
-
-    public synchronized boolean getRightBannerSensor() {
-        return mPeriodicInputs.right_sensor_state_;
-    }
-
-    public synchronized boolean getLimR() {
-        return mPeriodicInputs.limr_;
-    }
-
-    public synchronized void resetWristEncoder() {
-        mCanifier.setQuadraturePosition(0, 0);
-    }
-
-    public int getDeviceId() {
-        return mCanifier.getDeviceID();
-    }
-
-    public synchronized void setLEDColor(double red, double green, double blue) {
+    synchronized void setLEDColor(double red, double green, double blue) {
         if (red != mPeriodicOutputs.r_ || green != mPeriodicOutputs.g_ || blue != mPeriodicOutputs.b_) {
             mPeriodicOutputs.r_ = red;
             mPeriodicOutputs.g_ = green;
@@ -71,7 +46,6 @@ public class CarriageCanifier extends Subsystem {
         mCanifier.getGeneralInputs(pins);
         mPeriodicInputs.left_sensor_state_ = pins.SCL;
         mPeriodicInputs.right_sensor_state_ = pins.SDA;
-        mPeriodicInputs.limr_ = !pins.LIMR;
     }
 
     @Override
@@ -88,8 +62,7 @@ public class CarriageCanifier extends Subsystem {
     }
 
     @Override
-    public boolean checkSystem() {
-        return false;
+    public void checkSystem() {
     }
 
     @Override
@@ -110,15 +83,14 @@ public class CarriageCanifier extends Subsystem {
     }
 
     private static class PeriodicInputs {
-        public boolean left_sensor_state_;
-        public boolean right_sensor_state_;
-        public boolean limr_;
+        boolean left_sensor_state_;
+        boolean right_sensor_state_;
     }
 
     private static class PeriodicOutputs {
-        public double r_;
-        public double g_;
-        public double b_;
+        double r_;
+        double g_;
+        double b_;
     }
 }
 

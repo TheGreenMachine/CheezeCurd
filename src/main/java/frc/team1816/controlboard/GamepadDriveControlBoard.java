@@ -31,22 +31,8 @@ public class GamepadDriveControlBoard implements IDriveControlBoard {
     }
 
     @Override
-    public boolean getPoopyShoot() {
-        return false;
-    }
-
-    @Override
     public boolean getQuickTurn() {
         return mJoystick.getRawButton(6);
     }
 
-    @Override
-    public boolean getOpenJaw() {
-        return mJoystick.getRawAxis(3) != 0;
-    }
-
-    @Override
-    public boolean getShoot() {
-        return mJoystick.getRawAxis(2) != 0;
-    }
 }

@@ -15,8 +15,6 @@ public class AutoModeSelector {
         RIGHT,
     }
 
-    ;
-
     enum SwitchScalePosition {
         USE_FMS_DATA,
         LEFT_SWITCH_LEFT_SCALE,
@@ -24,8 +22,6 @@ public class AutoModeSelector {
         RIGHT_SWITCH_LEFT_SCALE,
         RIGHT_SWITCH_RIGHT_SCALE,
     }
-
-    ;
 
     enum DesiredMode {
         DO_NOTHING,
@@ -35,10 +31,7 @@ public class AutoModeSelector {
         ONLY_SCALE,
         LIVING_ROOM,
         SHOP,
-        ADVANCED, // This uses 4 additional sendable choosers to pick one for each field state combo
     }
-
-    ;
 
     private DesiredMode mCachedDesiredMode = null;
     private SwitchScalePosition mCachedSwitchScalePosition = null;
@@ -52,40 +45,36 @@ public class AutoModeSelector {
     private SendableChooser<SwitchScalePosition> mSwitchScalePositionChooser;
     private SendableChooser<StartingPosition> mStartPositionChooser;
 
-    public AutoModeSelector() {
+    AutoModeSelector() {
         mModeChooser = new SendableChooser<>();
-        mModeChooser.addDefault("Cross Auto Line", DesiredMode.CROSS_AUTO_LINE);
-        mModeChooser.addObject("Do Nothing", DesiredMode.DO_NOTHING);
-        mModeChooser.addObject("Simple switch", DesiredMode.SIMPLE_SWITCH);
-        mModeChooser.addObject("Scale AND Switch", DesiredMode.SCALE_AND_SWITCH);
-        mModeChooser.addObject("Only Scale", DesiredMode.ONLY_SCALE);
-        mModeChooser.addObject("Living Room",DesiredMode.LIVING_ROOM);
-        mModeChooser.addObject("Shop", DesiredMode.SHOP);
+        mModeChooser.setDefaultOption("Cross Auto Line", DesiredMode.CROSS_AUTO_LINE);
+        mModeChooser.addOption("Living Room",DesiredMode.LIVING_ROOM);
+        mModeChooser.addOption("Shop", DesiredMode.SHOP);
         SmartDashboard.putData("Auto mode", mModeChooser);
 
         mStartPositionChooser = new SendableChooser<>();
-        mStartPositionChooser.addDefault("Right", StartingPosition.RIGHT);
-        mStartPositionChooser.addObject("Center", StartingPosition.CENTER);
-        mStartPositionChooser.addObject("Left", StartingPosition.LEFT);
+        mStartPositionChooser.setDefaultOption("Right", StartingPosition.RIGHT);
+        mStartPositionChooser.addOption("Center", StartingPosition.CENTER);
+        mStartPositionChooser.addOption("Left", StartingPosition.LEFT);
         SmartDashboard.putData("Starting Position", mStartPositionChooser);
 
         mSwitchScalePositionChooser = new SendableChooser<>();
-        mSwitchScalePositionChooser.addDefault("Use FMS Data", SwitchScalePosition.USE_FMS_DATA);
-        mSwitchScalePositionChooser.addObject("Left Switch Left Scale", SwitchScalePosition.LEFT_SWITCH_LEFT_SCALE);
-        mSwitchScalePositionChooser.addObject("Left Switch Right Scale", SwitchScalePosition.LEFT_SWITCH_RIGHT_SCALE);
-        mSwitchScalePositionChooser.addObject("Right Switch Left Scale", SwitchScalePosition.RIGHT_SWITCH_LEFT_SCALE);
-        mSwitchScalePositionChooser.addObject("Right Switch Right Scale", SwitchScalePosition.RIGHT_SWITCH_RIGHT_SCALE);
+        mSwitchScalePositionChooser.setDefaultOption("Use FMS Data", SwitchScalePosition.USE_FMS_DATA);
+        mSwitchScalePositionChooser.addOption("Left Switch Left Scale", SwitchScalePosition.LEFT_SWITCH_LEFT_SCALE);
+        mSwitchScalePositionChooser.addOption("Left Switch Right Scale", SwitchScalePosition.LEFT_SWITCH_RIGHT_SCALE);
+        mSwitchScalePositionChooser.addOption("Right Switch Left Scale", SwitchScalePosition.RIGHT_SWITCH_LEFT_SCALE);
+        mSwitchScalePositionChooser.addOption("Right Switch Right Scale", SwitchScalePosition.RIGHT_SWITCH_RIGHT_SCALE);
         SmartDashboard.putData("Switch and Scale Position", mSwitchScalePositionChooser);
 
     }
 
-    public void updateModeCreator() {
+    void updateModeCreator() {
         DesiredMode desiredMode = mModeChooser.getSelected();
         StartingPosition staringPosition = mStartPositionChooser.getSelected();
         SwitchScalePosition switchScalePosition = mSwitchScalePositionChooser.getSelected();
         if (mCachedDesiredMode != desiredMode || staringPosition != mCachedStartingPosition || switchScalePosition != mCachedSwitchScalePosition) {
             System.out.println("Auto selection changed, updating creator: desiredMode->" + desiredMode.name() + ", starting position->" + staringPosition.name() + ", switch/scale position->" + switchScalePosition.name());
-            mCreator = getCreatorForParams(desiredMode, staringPosition);
+            mCreator = getCreatorForParams(desiredMode);
             if (switchScalePosition == SwitchScalePosition.USE_FMS_DATA) {
                 mFieldState.disableOverride();
             } else {
@@ -97,17 +86,10 @@ public class AutoModeSelector {
         mCachedSwitchScalePosition = switchScalePosition;
     }
 
-    private Optional<AutoModeCreator> getCreatorForParams(DesiredMode mode, StartingPosition position) {
-        boolean startOnLeft = StartingPosition.LEFT == position;
+    private Optional<AutoModeCreator> getCreatorForParams(DesiredMode mode) {
         switch (mode) {
-            case SIMPLE_SWITCH:
-                return Optional.of(new SimpleSwitchModeCreator());
             case CROSS_AUTO_LINE:
                 return Optional.of(new CrossAutoLineCreator());
-            case SCALE_AND_SWITCH:
-                return Optional.of(new SwitchAndScaleAutoModeCreator());
-            case ONLY_SCALE:
-                return Optional.of(new ScaleOnlyAutoModeCreator(startOnLeft));
             case LIVING_ROOM:
                 return  Optional.of(new LivingRoomModeCreator());
             case SHOP:
@@ -145,14 +127,14 @@ public class AutoModeSelector {
         mCachedDesiredMode = null;
     }
 
-    public void outputToSmartDashboard() {
+    void outputToSmartDashboard() {
         SmartDashboard.putString("AutoModeSelected", mCachedDesiredMode.name());
         SmartDashboard.putString("StartingPositionSelected", mCachedStartingPosition.name());
         SmartDashboard.putString("SwitchScalePositionSelected", mCachedSwitchScalePosition.name());
     }
 
-    public Optional<AutoModeBase> getAutoMode(AutoFieldState fieldState) {
-        if (!mCreator.isPresent()) {
+    Optional<AutoModeBase> getAutoMode(AutoFieldState fieldState) {
+        if (mCreator.isEmpty()) {
             return Optional.empty();
         }
         if (fieldState.isOverridingGameData()) {

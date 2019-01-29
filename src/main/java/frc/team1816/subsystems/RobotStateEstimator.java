@@ -8,14 +8,13 @@ import frc.team1816.loops.ILooper;
 import frc.team1816.loops.Loop;
 
 public class RobotStateEstimator extends Subsystem {
-    static RobotStateEstimator instance_ = new RobotStateEstimator();
+    private static RobotStateEstimator instance_ = new RobotStateEstimator();
     private RobotState robot_state_ = RobotState.getInstance();
     private Drive drive_ = Drive.getInstance();
     private double left_encoder_prev_distance_ = 0.0;
     private double right_encoder_prev_distance_ = 0.0;
-    private double back_encoder_prev_distance_ = 0.0;
 
-    RobotStateEstimator() {
+    private RobotStateEstimator() {
     }
 
     public static RobotStateEstimator getInstance() {
@@ -23,8 +22,7 @@ public class RobotStateEstimator extends Subsystem {
     }
 
     @Override
-    public boolean checkSystem() {
-        return false;
+    public void checkSystem() {
     }
 
     @Override

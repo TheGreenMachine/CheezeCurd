@@ -16,11 +16,6 @@ public class DriveTrajectory implements Action {
     private final TrajectoryIterator<TimedState<Pose2dWithCurvature>> mTrajectory;
     private final boolean mResetPose;
 
-    public DriveTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> trajectory) {
-        this(trajectory, false);
-    }
-
-
     public DriveTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> trajectory, boolean resetPose) {
         mTrajectory = new TrajectoryIterator<>(new TimedView<>(trajectory));
         mResetPose = resetPose;

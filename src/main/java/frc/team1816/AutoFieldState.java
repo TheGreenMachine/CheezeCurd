@@ -128,7 +128,7 @@ public class AutoFieldState {
         }
     }
 
-    public void outputToSmartDashboard() {
+    void outputToSmartDashboard() {
         SmartDashboard.putString("FieldState OurSwitch", getOurSwitchSide() == null ? "NULL" : getOurSwitchSide().toString());
         SmartDashboard.putString("FieldState Scale", getScaleSide() == null ? "NULL" : getScaleSide().toString());
         SmartDashboard.putString("FieldState TheirSwitch", getOpponentSwitchSide() == null ? "NULL" : getOpponentSwitchSide().toString());

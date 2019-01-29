@@ -16,20 +16,12 @@ public class SubsystemManager implements ILooper {
     private final List<Subsystem> mAllSubsystems;
     private List<Loop> mLoops = new ArrayList<>();
 
-    public SubsystemManager(List<Subsystem> allSubsystems) {
+    SubsystemManager(List<Subsystem> allSubsystems) {
         mAllSubsystems = allSubsystems;
     }
 
-    public void outputToSmartDashboard() {
-        mAllSubsystems.forEach((s) -> s.outputTelemetry());
-    }
-
-    public void writeToLog() {
-        mAllSubsystems.forEach((s) -> s.writeToLog());
-    }
-
     public void stop() {
-        mAllSubsystems.forEach((s) -> s.stop());
+        mAllSubsystems.forEach(Subsystem::stop);
     }
 
     private class EnabledLoop implements Loop {
@@ -85,12 +77,12 @@ public class SubsystemManager implements ILooper {
         }
     }
 
-    public void registerEnabledLoops(Looper enabledLooper) {
+    void registerEnabledLoops(Looper enabledLooper) {
         mAllSubsystems.forEach((s) -> s.registerEnabledLoops(this));
         enabledLooper.register(new EnabledLoop());
     }
 
-    public void registerDisabledLoops(Looper disabledLooper) {
+    void registerDisabledLoops(Looper disabledLooper) {
         disabledLooper.register(new DisabledLoop());
     }
 

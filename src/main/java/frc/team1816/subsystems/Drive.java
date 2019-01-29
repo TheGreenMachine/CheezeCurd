@@ -1,13 +1,11 @@
 package frc.team1816.subsystems;
 
-import badlog.lib.BadLog;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.*;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
-import com.team254.lib.drivers.ISolenoid;
 import com.team254.lib.drivers.TalonSRXChecker;
+import com.team254.lib.drivers.TalonSRXChecker.CheckerConfig;
 import com.team254.lib.drivers.TalonSRXFactory;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Pose2dWithCurvature;
@@ -32,19 +30,15 @@ import static frc.team1816.Constants.kPigeon;
 public class Drive extends Subsystem {
 
     private static final int kLowGearVelocityControlSlot = 0;
-    private static final int kHighGearVelocityControlSlot = 1;
     private static final double DRIVE_ENCODER_PPR = 960;
     private static Drive mInstance = new Drive();
     // Hardware
     private final IMotorControllerEnhanced mLeftMaster, mRightMaster, mLeftSlaveA, mRightSlaveA, mLeftSlaveB, mRightSlaveB;
-    private final ISolenoid mShifter;
     // Control states
     private DriveControlState mDriveControlState;
     private PigeonIMU mPigeon;
     // Hardware states
     private PeriodicIO mPeriodicIO;
-    private boolean mAutoShift;
-    private boolean mIsHighGear;
     private boolean mIsBrakeMode;
     private ReflectingCSVWriter<PeriodicIO> mCSVWriter = null;
     private DriveMotionPlanner mMotionPlanner;
@@ -57,7 +51,7 @@ public class Drive extends Subsystem {
             synchronized (Drive.this) {
                 setOpenLoop(new DriveSignal(0.05, 0.05));
                 setBrakeMode(false);
-//                 startLogging();
+                startLogging();
             }
         }
 
@@ -73,14 +67,6 @@ public class Drive extends Subsystem {
                     default:
                         System.out.println("Unexpected drive control state: " + mDriveControlState);
                         break;
-                }
-                /*
-                // TODO: fix this (tom)
-                if (mAutoShift) {
-                    handleAutoShift();
-                } else */
-                {
-                    setHighGear(false);
                 }
             }
         }
@@ -135,16 +121,10 @@ public class Drive extends Subsystem {
                 Constants.kRightDriveMasterId);
         mRightSlaveB.setInverted(true);
 
-        mShifter = Constants.makeSolenoidForId(Constants.kShifterSolenoidId);
-
         reloadGains();
 
         mPigeon = new PigeonIMU(kPigeon);
         mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR,10,10);
-
-        // Force a solenoid message.
-        mIsHighGear = true;
-        setHighGear(false);
 
         setOpenLoop(DriveSignal.NEUTRAL);
 
@@ -164,18 +144,6 @@ public class Drive extends Subsystem {
         return rotations * (Constants.kDriveWheelDiameterInches * Math.PI);
     }
 
-    private static double rpmToInchesPerSecond(double rpm) {
-        return rotationsToInches(rpm) / 60;
-    }
-
-    private static double inchesToRotations(double inches) {
-        return inches / (Constants.kDriveWheelDiameterInches * Math.PI);
-    }
-
-    private static double inchesPerSecondToRpm(double inches_per_second) {
-        return inchesToRotations(inches_per_second) * 60;
-    }
-
     private static double radiansPerSecondToTicksPer100ms(double rad_s) {
         return rad_s / (Math.PI * 2.0) * DRIVE_ENCODER_PPR / 10.0;
     }
@@ -191,8 +159,6 @@ public class Drive extends Subsystem {
     public synchronized void setOpenLoop(DriveSignal signal) {
         if (mDriveControlState != DriveControlState.OPEN_LOOP) {
             setBrakeMode(false);
-            mAutoShift = true;
-
             System.out.println("Switching to open loop");
             System.out.println(signal);
             mDriveControlState = DriveControlState.OPEN_LOOP;
@@ -212,7 +178,6 @@ public class Drive extends Subsystem {
         if (mDriveControlState != DriveControlState.PATH_FOLLOWING) {
             // We entered a velocity control state.
             setBrakeMode(true);
-            mAutoShift = false;
             mLeftMaster.selectProfileSlot(kLowGearVelocityControlSlot, 0);
             mRightMaster.selectProfileSlot(kLowGearVelocityControlSlot, 0);
             mLeftMaster.configNeutralDeadband(0.0, 0);
@@ -242,22 +207,7 @@ public class Drive extends Subsystem {
         return mMotionPlanner.isDone() || mOverrideTrajectory;
     }
 
-    public boolean isHighGear() {
-        return mIsHighGear;
-    }
-
-    public synchronized void setHighGear(boolean wantsHighGear) {
-        if (wantsHighGear != mIsHighGear) {
-            mIsHighGear = wantsHighGear;
-            mShifter.set(wantsHighGear);
-        }
-    }
-
-    public boolean isBrakeMode() {
-        return mIsBrakeMode;
-    }
-
-    public synchronized void setBrakeMode(boolean on) {
+    private synchronized void setBrakeMode(boolean on) {
         if (mIsBrakeMode != on) {
             mIsBrakeMode = on;
             NeutralMode mode = on ? NeutralMode.Brake : NeutralMode.Coast;
@@ -271,7 +221,7 @@ public class Drive extends Subsystem {
         }
     }
 
-    public synchronized Rotation2d getHeading() {
+    synchronized Rotation2d getHeading() {
         return mPeriodicIO.gyro_heading;
     }
 
@@ -317,7 +267,7 @@ public class Drive extends Subsystem {
         }
     }
 
-    public synchronized void resetEncoders() {
+    private synchronized void resetEncoders() {
         mLeftMaster.setSelectedSensorPosition(0, 0, 0);
         mRightMaster.setSelectedSensorPosition(0, 0, 0);
         mPeriodicIO = new PeriodicIO();
@@ -327,14 +277,13 @@ public class Drive extends Subsystem {
     public void zeroSensors() {
         setHeading(Rotation2d.identity());
         resetEncoders();
-        mAutoShift = true;
     }
 
-    public double getLeftEncoderRotations() {
+    private double getLeftEncoderRotations() {
         return mPeriodicIO.left_position_ticks / DRIVE_ENCODER_PPR;
     }
 
-    public double getRightEncoderRotations() {
+    private double getRightEncoderRotations() {
         return mPeriodicIO.right_position_ticks / DRIVE_ENCODER_PPR;
     }
 
@@ -350,7 +299,7 @@ public class Drive extends Subsystem {
         return mPeriodicIO.right_velocity_ticks_per_100ms;
     }
 
-    public double getRightLinearVelocity() {
+    double getRightLinearVelocity() {
         return rotationsToInches(getRightVelocityNativeUnits() * 10.0 / DRIVE_ENCODER_PPR);
     }
 
@@ -374,28 +323,8 @@ public class Drive extends Subsystem {
         return mPeriodicIO.right_error;
     }
 
-    public double getLeftFF(){
-        return mPeriodicIO.left_feedforward;
-    }
-
-    public double getRightFF(){
-        return mPeriodicIO.right_feedforward;
-    }
-
-    public double getLeftLinearVelocity() {
+    double getLeftLinearVelocity() {
         return rotationsToInches(getLeftVelocityNativeUnits() * 10.0 / DRIVE_ENCODER_PPR);
-    }
-
-    public double getLinearVelocity() {
-        return (getLeftLinearVelocity() + getRightLinearVelocity()) / 2.0;
-    }
-
-    public double getAngularVelocity() {
-        return (getRightLinearVelocity() - getLeftLinearVelocity()) / Constants.kDriveWheelTrackWidthInches;
-    }
-
-    public void overrideTrajectory(boolean value) {
-        mOverrideTrajectory = value;
     }
 
     private void updatePathFollower() {
@@ -424,29 +353,17 @@ public class Drive extends Subsystem {
         }
     }
 
-    private void handleAutoShift() {
-        final double linear_velocity = Math.abs(getLinearVelocity());
-        final double angular_velocity = Math.abs(getAngularVelocity());
-        if (mIsHighGear && linear_velocity < Constants.kDriveDownShiftVelocity && angular_velocity < Constants
-                .kDriveDownShiftAngularVelocity) {
-            setHighGear(false);
-        } else if (!mIsHighGear && linear_velocity > Constants.kDriveUpShiftVelocity) {
-            setHighGear(true);
-        }
+    private synchronized void reloadGains() {
+        reloadTalonGains(mLeftMaster);
+        reloadTalonGains(mRightMaster);
     }
 
-    public synchronized void reloadGains() {
-        mLeftMaster.config_kP(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKp, Constants.kLongCANTimeoutMs);
-        mLeftMaster.config_kI(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKi, Constants.kLongCANTimeoutMs);
-        mLeftMaster.config_kD(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKd, Constants.kLongCANTimeoutMs);
-        mLeftMaster.config_kF(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKf, Constants.kLongCANTimeoutMs);
-        mLeftMaster.config_IntegralZone(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityIZone, Constants.kLongCANTimeoutMs);
-
-        mRightMaster.config_kP(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKp, Constants.kLongCANTimeoutMs);
-        mRightMaster.config_kI(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKi, Constants.kLongCANTimeoutMs);
-        mRightMaster.config_kD(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKd, Constants.kLongCANTimeoutMs);
-        mRightMaster.config_kF(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKf, Constants.kLongCANTimeoutMs);
-        mRightMaster.config_IntegralZone(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityIZone, Constants.kLongCANTimeoutMs);
+    private void reloadTalonGains(IMotorControllerEnhanced talon) {
+        talon.config_kP(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKp, Constants.kLongCANTimeoutMs);
+        talon.config_kI(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKi, Constants.kLongCANTimeoutMs);
+        talon.config_kD(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKd, Constants.kLongCANTimeoutMs);
+        talon.config_kF(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKf, Constants.kLongCANTimeoutMs);
+        talon.config_IntegralZone(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityIZone, Constants.kLongCANTimeoutMs);
     }
 
     @Override
@@ -500,49 +417,44 @@ public class Drive extends Subsystem {
     }
 
     @Override
-    public boolean checkSystem() {
+    public void checkSystem() {
         boolean leftSide = TalonSRXChecker.CheckTalons(this,
-                new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
+                new ArrayList<>() {
                     {
                         add(new TalonSRXChecker.TalonSRXConfig("left_master", mLeftMaster));
                         add(new TalonSRXChecker.TalonSRXConfig("left_slave", mLeftSlaveA));
                         add(new TalonSRXChecker.TalonSRXConfig("left_slave1", mLeftSlaveB));
                     }
-                }, new TalonSRXChecker.CheckerConfig() {
-                    {
-                        mCurrentFloor = .1;
-                        mRPMFloor = 160;
-                        mCurrentEpsilon = .2;
-                        mRPMEpsilon = 20;
-                        mRPMSupplier = () -> mLeftMaster.getSelectedSensorVelocity(0);
-                    }
-                });
+                }, getTalonCheckerConfig(mLeftMaster));
         boolean rightSide = TalonSRXChecker.CheckTalons(this,
-                new ArrayList<TalonSRXChecker.TalonSRXConfig>() {
+                new ArrayList<>() {
                     {
                         add(new TalonSRXChecker.TalonSRXConfig("right_master", mRightMaster));
                         add(new TalonSRXChecker.TalonSRXConfig("right_slave", mRightSlaveA));
                         add(new TalonSRXChecker.TalonSRXConfig("right_slave1", mRightSlaveB));
                     }
-                }, new TalonSRXChecker.CheckerConfig() {
-                    {
-                        mCurrentFloor = .1;
-                        mRPMFloor = 160;
-                        mCurrentEpsilon = .2;
-                        mRPMEpsilon = 20;
-                        mRPMSupplier = () -> mRightMaster.getSelectedSensorVelocity(0);
-                    }
-                });
-        return leftSide && rightSide;
+                }, getTalonCheckerConfig(mRightMaster));
     }
 
-    public synchronized void startLogging() {
+    private CheckerConfig getTalonCheckerConfig(IMotorControllerEnhanced talon) {
+        return new CheckerConfig() {
+            {
+                mCurrentFloor = .1;
+                mRPMFloor = 160;
+                mCurrentEpsilon = .2;
+                mRPMEpsilon = 20;
+                mRPMSupplier = () -> talon.getSelectedSensorVelocity(0);
+            }
+        };
+    }
+
+    private synchronized void startLogging() {
         if (mCSVWriter == null) {
             mCSVWriter = new ReflectingCSVWriter<>("/home/lvuser/DRIVE-LOGS.csv", PeriodicIO.class);
         }
     }
 
-    public synchronized void stopLogging() {
+    private synchronized void stopLogging() {
         if (mCSVWriter != null) {
             mCSVWriter.flush();
             mCSVWriter = null;
@@ -555,33 +467,27 @@ public class Drive extends Subsystem {
         PATH_FOLLOWING, // velocity PID control
     }
 
-    public enum ShifterState {
-        FORCE_LOW_GEAR,
-        FORCE_HIGH_GEAR,
-        AUTO_SHIFT
-    }
-
     public static class PeriodicIO {
         // INPUTS
-        public int left_position_ticks;
-        public int right_position_ticks;
-        public double left_distance;
-        public double right_distance;
-        public int left_velocity_ticks_per_100ms;
-        public int right_velocity_ticks_per_100ms;
-        public Rotation2d gyro_heading = Rotation2d.identity();
-        public Pose2d error = Pose2d.identity();
-        public double left_error;
-        public double right_error;
+        int left_position_ticks;
+        int right_position_ticks;
+        double left_distance;
+        double right_distance;
+        int left_velocity_ticks_per_100ms;
+        int right_velocity_ticks_per_100ms;
+        Rotation2d gyro_heading = Rotation2d.identity();
+        Pose2d error = Pose2d.identity();
+        double left_error;
+        double right_error;
 
         // OUTPUTS
-        public double left_demand;
-        public double right_demand;
-        public double left_accel;
-        public double right_accel;
-        public double left_feedforward;
-        public double right_feedforward;
-        public TimedState<Pose2dWithCurvature> path_setpoint = new TimedState<Pose2dWithCurvature>(Pose2dWithCurvature.identity());
+        double left_demand;
+        double right_demand;
+        double left_accel;
+        double right_accel;
+        double left_feedforward;
+        double right_feedforward;
+        TimedState<Pose2dWithCurvature> path_setpoint = new TimedState<>(Pose2dWithCurvature.identity());
     }
 }
 
