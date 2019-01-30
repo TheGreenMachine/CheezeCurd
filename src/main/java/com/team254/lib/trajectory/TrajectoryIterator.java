@@ -3,9 +3,9 @@ package com.team254.lib.trajectory;
 import com.team254.lib.geometry.State;
 
 public class TrajectoryIterator<S extends State<S>> {
-    protected final TrajectoryView<S> view_;
-    protected double progress_ = 0.0;
-    protected TrajectorySamplePoint<S> current_sample_;
+    private final TrajectoryView<S> view_;
+    private double progress_;
+    private TrajectorySamplePoint<S> current_sample_;
 
     public TrajectoryIterator(final TrajectoryView<S> view) {
         view_ = view;
