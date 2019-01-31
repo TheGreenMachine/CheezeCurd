@@ -15,6 +15,7 @@ public class DriveTrajectory implements Action {
 
     private final TrajectoryIterator<TimedState<Pose2dWithCurvature>> mTrajectory;
     private final boolean mResetPose;
+    private boolean done;
 
     public DriveTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> trajectory, boolean resetPose) {
         mTrajectory = new TrajectoryIterator<>(new TimedView<>(trajectory));
@@ -24,7 +25,10 @@ public class DriveTrajectory implements Action {
     @Override
     public boolean isFinished() {
         if (mDrive.isDoneWithTrajectory()) {
-            System.out.println("Trajectory finished");
+            if(!done) {
+                System.out.println("Trajectory finished");
+            }
+            done = true;
             return true;
         }
         return false;
