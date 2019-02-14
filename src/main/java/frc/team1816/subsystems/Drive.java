@@ -6,7 +6,6 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import com.team254.lib.drivers.TalonSRXChecker;
 import com.team254.lib.drivers.TalonSRXChecker.CheckerConfig;
-import com.team254.lib.drivers.TalonSRXFactory;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Pose2dWithCurvature;
 import com.team254.lib.geometry.Rotation2d;
@@ -25,15 +24,20 @@ import frc.team1816.planners.DriveMotionPlanner;
 
 import java.util.ArrayList;
 
-import static frc.team1816.Constants.kPigeon;
+import static frc.team1816.Robot.factory;
 
 public class Drive extends Subsystem {
 
-    private static final int kLowGearVelocityControlSlot = 0;
-    private static final double DRIVE_ENCODER_PPR = 960;
+    private static final String NAME = "drivetrain";
+    private static final double DRIVE_ENCODER_PPR = factory.getConstant(NAME, "encPPR");
     private static Drive mInstance = new Drive();
     // Hardware
-    private final IMotorControllerEnhanced mLeftMaster, mRightMaster, mLeftSlaveA, mRightSlaveA, mLeftSlaveB, mRightSlaveB;
+    private final IMotorControllerEnhanced mLeftMaster;
+    private final IMotorControllerEnhanced mRightMaster;
+    private final IMotorController mLeftSlaveA;
+    private final IMotorController mRightSlaveA;
+    private final IMotorController mLeftSlaveB;
+    private final IMotorController mRightSlaveB;
     // Control states
     private DriveControlState mDriveControlState;
     private PigeonIMU mPigeon;
@@ -44,6 +48,7 @@ public class Drive extends Subsystem {
     private DriveMotionPlanner mMotionPlanner;
     private Rotation2d mGyroOffset = Rotation2d.identity();
     private boolean mOverrideTrajectory = false;
+    private static double kD =factory.getConstant(NAME,"kD");
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -99,31 +104,27 @@ public class Drive extends Subsystem {
         mPeriodicIO = new PeriodicIO();
 
         // Start all Talons in open loop mode.
-        mLeftMaster = TalonSRXFactory.createDefaultTalon(Constants.kLeftDriveMasterId);
+        mLeftMaster = factory.getMotor(NAME, "leftMain");
         configureMaster(mLeftMaster, true);
 
-        mLeftSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveAId,
-                Constants.kLeftDriveMasterId);
+        mLeftSlaveA = factory.getMotor(NAME, "leftSlaveOne", "leftMain");
         mLeftSlaveA.setInverted(false);
 
-        mLeftSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kLeftDriveSlaveBId,
-                Constants.kLeftDriveMasterId);
+        mLeftSlaveB = factory.getMotor(NAME, "leftSlaveTwo", "leftMain");
         mLeftSlaveB.setInverted(false);
 
-        mRightMaster = TalonSRXFactory.createDefaultTalon(Constants.kRightDriveMasterId);
+        mRightMaster = factory.getMotor(NAME, "rightMain");
         configureMaster(mRightMaster, false);
 
-        mRightSlaveA = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveAId,
-                Constants.kRightDriveMasterId);
+        mRightSlaveA = factory.getMotor(NAME, "rightSlaveOne", "rightMain");
         mRightSlaveA.setInverted(true);
 
-        mRightSlaveB = TalonSRXFactory.createPermanentSlaveTalon(Constants.kRightDriveSlaveBId,
-                Constants.kRightDriveMasterId);
+        mRightSlaveB = factory.getMotor(NAME, "rightSlaveTwo", "rightMain");
         mRightSlaveB.setInverted(true);
 
         reloadGains();
 
-        mPigeon = new PigeonIMU(kPigeon);
+        mPigeon = new PigeonIMU(factory.getConstant(NAME,"pigeonId").intValue());
         mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR,10,10);
 
         setOpenLoop(DriveSignal.NEUTRAL);
@@ -178,8 +179,8 @@ public class Drive extends Subsystem {
         if (mDriveControlState != DriveControlState.PATH_FOLLOWING) {
             // We entered a velocity control state.
             setBrakeMode(true);
-            mLeftMaster.selectProfileSlot(kLowGearVelocityControlSlot, 0);
-            mRightMaster.selectProfileSlot(kLowGearVelocityControlSlot, 0);
+            mLeftMaster.selectProfileSlot(0, 0);
+            mRightMaster.selectProfileSlot(0, 0);
             mLeftMaster.configNeutralDeadband(0.0, 0);
             mRightMaster.configNeutralDeadband(0.0, 0);
 
@@ -359,11 +360,11 @@ public class Drive extends Subsystem {
     }
 
     private void reloadTalonGains(IMotorControllerEnhanced talon) {
-        talon.config_kP(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKp, Constants.kLongCANTimeoutMs);
-        talon.config_kI(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKi, Constants.kLongCANTimeoutMs);
-        talon.config_kD(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKd, Constants.kLongCANTimeoutMs);
-        talon.config_kF(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityKf, Constants.kLongCANTimeoutMs);
-        talon.config_IntegralZone(kLowGearVelocityControlSlot, Constants.kDriveLowGearVelocityIZone, Constants.kLongCANTimeoutMs);
+        talon.config_kP(0, factory.getConstant(NAME,"kP"), Constants.kLongCANTimeoutMs);
+        talon.config_kI(0, factory.getConstant(NAME,"kI"), Constants.kLongCANTimeoutMs);
+        talon.config_kD(0, kD, Constants.kLongCANTimeoutMs);
+        talon.config_kF(0, factory.getConstant(NAME,"kF"), Constants.kLongCANTimeoutMs);
+        talon.config_IntegralZone(0, factory.getConstant(NAME,"iZone").intValue(), Constants.kLongCANTimeoutMs);
     }
 
     @Override
@@ -410,9 +411,9 @@ public class Drive extends Subsystem {
             mRightMaster.set(ControlMode.PercentOutput, mPeriodicIO.right_demand, DemandType.ArbitraryFeedForward, 0.0);
         } else {
             mLeftMaster.set(ControlMode.Velocity, mPeriodicIO.left_demand, DemandType.ArbitraryFeedForward,
-                    mPeriodicIO.left_feedforward + Constants.kDriveLowGearVelocityKd * mPeriodicIO.left_accel / 1023.0);
+                    mPeriodicIO.left_feedforward + kD * mPeriodicIO.left_accel / 1023.0);
             mRightMaster.set(ControlMode.Velocity, mPeriodicIO.right_demand, DemandType.ArbitraryFeedForward,
-                    mPeriodicIO.right_feedforward + Constants.kDriveLowGearVelocityKd * mPeriodicIO.right_accel / 1023.0);
+                    mPeriodicIO.right_feedforward + kD * mPeriodicIO.right_accel / 1023.0);
         }
     }
 
@@ -422,16 +423,12 @@ public class Drive extends Subsystem {
                 new ArrayList<>() {
                     {
                         add(new TalonSRXChecker.TalonSRXConfig("left_master", mLeftMaster));
-                        add(new TalonSRXChecker.TalonSRXConfig("left_slave", mLeftSlaveA));
-                        add(new TalonSRXChecker.TalonSRXConfig("left_slave1", mLeftSlaveB));
                     }
                 }, getTalonCheckerConfig(mLeftMaster));
         boolean rightSide = TalonSRXChecker.CheckTalons(this,
                 new ArrayList<>() {
                     {
                         add(new TalonSRXChecker.TalonSRXConfig("right_master", mRightMaster));
-                        add(new TalonSRXChecker.TalonSRXConfig("right_slave", mRightSlaveA));
-                        add(new TalonSRXChecker.TalonSRXConfig("right_slave1", mRightSlaveB));
                     }
                 }, getTalonCheckerConfig(mRightMaster));
     }

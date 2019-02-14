@@ -4,7 +4,10 @@ import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifierStatusFrame;
 import frc.team1816.Constants;
 
+import static frc.team1816.Robot.factory;
+
 public class CarriageCanifier extends Subsystem {
+    private static final String NAME = "canifier";
     private static CarriageCanifier mInstance;
     private CANifier mCanifier;
     private PeriodicInputs mPeriodicInputs;
@@ -12,8 +15,8 @@ public class CarriageCanifier extends Subsystem {
     private boolean mOutputsChanged;
 
     private CarriageCanifier() {
-        mCanifier = new CANifier(Constants.kCanifierId);
-        if(Constants.kCanifierId >= 0) {
+        mCanifier = new CANifier(factory.getConstant(NAME,"canId").intValue());
+        if(mCanifier.getDeviceID() >= 0) {
             mCanifier.setStatusFramePeriod(CANifierStatusFrame.Status_1_General, 100, Constants.kLongCANTimeoutMs);
             mCanifier.setStatusFramePeriod(CANifierStatusFrame.Status_2_General, 2, Constants.kLongCANTimeoutMs);
         }

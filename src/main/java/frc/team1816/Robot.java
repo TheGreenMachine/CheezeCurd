@@ -1,6 +1,7 @@
 package frc.team1816;
 
 import badlog.lib.BadLog;
+import com.edinarobotics.utils.hardware.RobotFactory;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.util.CheesyDriveHelper;
 import com.team254.lib.util.CrashTracker;
@@ -47,21 +48,18 @@ public class Robot extends TimedRobot {
         CrashTracker.logRobotConstruction();
     }
 
+    public static final RobotFactory factory = new RobotFactory(System.getenv("ROBOT_NAME"));
+
     @Override
     public void robotInit() {
         try {
             @SuppressWarnings("SpellCheckingInspection")
             var logFile = new SimpleDateFormat("DDDHHmm").format(new Date());
             logger = BadLog.init("/home/lvuser/" + logFile + ".bag");
-            BadLog.createValue("kF", String.valueOf(Constants.kDriveLowGearVelocityKf));
-            BadLog.createValue("kP", String.valueOf(Constants.kDriveLowGearVelocityKp));
-            BadLog.createValue("kD", String.valueOf(Constants.kDriveLowGearVelocityKd));
-            BadLog.createValue("kI", String.valueOf(Constants.kDriveLowGearVelocityKi));
-            BadLog.createValue("iZone", String.valueOf(Constants.kDriveLowGearVelocityIZone));
-            BadLog.createTopic("Drivetrain/LeftVel", "NativeUnits", mDrive::getLeftVelocityNativeUnits, "hide", "join:Drivetrain/Velocities");
-            BadLog.createTopic("Drivetrain/RightVel", "NativeUnits", mDrive::getRightVelocityNativeUnits, "hide", "join:Drivetrain/Velocities");
-            BadLog.createTopic("Drivetrain/LeftActVel", "NativeUnits", mDrive::getLeftVelocityDemand, "hide", "join:Drivetrain/Velocities");
-            BadLog.createTopic("Drivetrain/RightActVel", "NativeUnits", mDrive::getRightVelocityDemand, "hide", "join:Drivetrain/Velocities");
+            BadLog.createTopic("Drivetrain/LeftActVel", "NativeUnits", mDrive::getLeftVelocityNativeUnits, "hide", "join:Drivetrain/Velocities");
+            BadLog.createTopic("Drivetrain/RightActVel", "NativeUnits", mDrive::getRightVelocityNativeUnits, "hide", "join:Drivetrain/Velocities");
+            BadLog.createTopic("Drivetrain/LeftVel", "NativeUnits", mDrive::getLeftVelocityDemand, "hide", "join:Drivetrain/Velocities");
+            BadLog.createTopic("Drivetrain/RightVel", "NativeUnits", mDrive::getRightVelocityDemand, "hide", "join:Drivetrain/Velocities");
             BadLog.createTopic("Drivetrain/LeftError", "NativeUnits", mDrive::getLeftError, "hide", "join:Drivetrain/VelocityError");
             BadLog.createTopic("Drivetrain/RightError", "NativeUnits", mDrive::getRightError, "hide", "join:Drivetrain/VelocityError");
             BadLog.createTopic("Drivetrain/LeftDistance", "Inches", mDrive::getLeftEncoderDistance, "hide", "join:Drivetrain/Distance");

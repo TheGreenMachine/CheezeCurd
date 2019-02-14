@@ -13,10 +13,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static frc.team1816.Robot.factory;
+
 public class TrajectoryGenerator {
     // velocities are in/sec
-    private static final double kMaxVelocity = 25;
-    private static final double kMaxAccel = 25;
+    private static final double kMaxVelocity = factory.getConstant("maxVel");
+    private static final double kMaxAccel = factory.getConstant("maxAccel");
     private static final double kMaxCentripetalAccel = 100.0;
     private static final double kMaxVoltage = 9.0;
 
@@ -60,6 +62,7 @@ public class TrajectoryGenerator {
 
     // STARTING IN CENTER
     private static final Pose2d kCenterStartPose = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(180.0));
+    private static final Pose2d kCenterStraightPose = new Pose2d(15, 0.0, Rotation2d.fromDegrees(180.0));
 
     public class TrajectorySet {
 
@@ -79,11 +82,21 @@ public class TrajectoryGenerator {
 
         public final Trajectory<TimedState<Pose2dWithCurvature>> centerStartToStairs;
         public final Trajectory<TimedState<Pose2dWithCurvature>> centerStartToVex;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> centerPID;
 
         private TrajectorySet() {
             centerStartToStairs = getCenterStartToStairs();
             centerStartToVex = getCenterStartToVex();
-        }    
+            centerPID = getPID();
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getPID() {
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(kCenterStartPose);
+            waypoints.add(kCenterStraightPose);
+            return mMotionPlanner.generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
+                    kMaxVelocity, kMaxAccel, kMaxVoltage);
+        }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getCenterStartToStairs() {
             List<Pose2d> waypoints = new ArrayList<>();

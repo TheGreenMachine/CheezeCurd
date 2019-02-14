@@ -24,13 +24,10 @@ public class AutoModeSelector {
     }
 
     enum DesiredMode {
-        DO_NOTHING,
         CROSS_AUTO_LINE,
-        SIMPLE_SWITCH,
-        SCALE_AND_SWITCH,
-        ONLY_SCALE,
         LIVING_ROOM,
         SHOP,
+        PID
     }
 
     private DesiredMode mCachedDesiredMode = null;
@@ -50,6 +47,7 @@ public class AutoModeSelector {
         mModeChooser.setDefaultOption("Cross Auto Line", DesiredMode.CROSS_AUTO_LINE);
         mModeChooser.addOption("Living Room",DesiredMode.LIVING_ROOM);
         mModeChooser.addOption("Shop", DesiredMode.SHOP);
+        mModeChooser.addOption("PID", DesiredMode.PID);
         SmartDashboard.putData("Auto mode", mModeChooser);
 
         mStartPositionChooser = new SendableChooser<>();
@@ -94,6 +92,8 @@ public class AutoModeSelector {
                 return  Optional.of(new LivingRoomModeCreator());
             case SHOP:
                 return Optional.of(new ShopModeCreator());
+            case PID:
+                return Optional.of(new PIDModeCreator());
             default:
                 break;
         }
