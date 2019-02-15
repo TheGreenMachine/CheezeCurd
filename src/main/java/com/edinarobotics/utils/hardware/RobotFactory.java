@@ -97,6 +97,7 @@ public class RobotFactory {
     }
 
     public Double getConstant(String subsystem, String name) {
+        //System.out.println(config.constants.toString());
         return getSubsystem(subsystem).constants.get(name);
     }
 

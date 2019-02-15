@@ -2,6 +2,7 @@ package frc.team1816.subsystems;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.*;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import com.team254.lib.drivers.TalonSRXChecker;
@@ -124,8 +125,10 @@ public class Drive extends Subsystem {
 
         reloadGains();
 
-        mPigeon = new PigeonIMU(factory.getConstant(NAME,"pigeonId").intValue());
+        mPigeon = new PigeonIMU((TalonSRX) mLeftSlaveB);
         mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR,10,10);
+        //System.out.println("Pigeon Initialised");
+        System.out.println("Pigeon heading" + mPigeon.getFusedHeading());
 
         setOpenLoop(DriveSignal.NEUTRAL);
 
