@@ -2,25 +2,28 @@ subsystems:
   drivetrain:
     implemented: true
     talons:
-      leftMain: 1
-      leftSlaveOne: 2
+      leftMain: 2
+      leftSlaveOne: 1
       leftSlaveTwo: 3
-      rightMain: 5
-      rightSlaveOne: 6
-      rightSlaveTwo: 7
-  climber:
+      rightMain: 7
+      rightSlaveOne: 5
+      rightSlaveTwo: 6
+    constants:
+      pigeonId: 3
+      kP: 5.0
+      kI: 0
+      kD: 1.0
+      kF: 0
+      iZone: 0
+      encPPR: 4096
+      maxPos: 1475
+      minPos: 915
+  canifier:
     implemented: false
-    talons:
-      one: 8
-  cargoshooter:
-    implemented: false
-    talons:
-      arm: -1
-      intake: -1
-  constants:
-    kP: 5.0
-    kI: 0
-    kD: 1.0
-    kF: 0
-    maxPos: 1475
-    minPos: 915
+    constants:
+      canId: 12
+constants:
+  wheelDiameter: 7.25
+  trackWidth: 21.75
+  maxVel: 25
+  maxAccel: 75
