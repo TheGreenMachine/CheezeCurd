@@ -49,7 +49,7 @@ public class Drive extends Subsystem {
     private DriveMotionPlanner mMotionPlanner;
     private Rotation2d mGyroOffset = Rotation2d.identity();
     private boolean mOverrideTrajectory = false;
-    private static double kD =factory.getConstant(NAME,"kD");
+    private static double kD = factory.getConstant(NAME, "kD");
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -125,10 +125,28 @@ public class Drive extends Subsystem {
 
         reloadGains();
 
-        mPigeon = new PigeonIMU((TalonSRX) mLeftSlaveB);
-        mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR,10,10);
-        //System.out.println("Pigeon Initialised");
-        System.out.println("Pigeon heading" + mPigeon.getFusedHeading());
+        if (factory.getConstant(NAME, "pigeonOnTalon").intValue() == 1) {
+            var pigeonId = factory.getConstant(NAME, "pigeonId").intValue();
+            System.out.println("Pigeon on Talon " + pigeonId);
+            IMotorController master = null;
+            if (mLeftSlaveA.getDeviceID() == pigeonId) {
+                master = mLeftSlaveA;
+            } else if (mLeftSlaveB.getDeviceID() == pigeonId) {
+                master = mLeftSlaveB;
+            } else if (mRightSlaveA.getDeviceID() == pigeonId) {
+                master = mRightSlaveA;
+            } else if (mRightSlaveB.getDeviceID() == pigeonId) {
+                master = mRightSlaveB;
+            }
+            if(master != null) {
+                mPigeon = new PigeonIMU((TalonSRX) master);
+            }
+        } else {
+            mPigeon = new PigeonIMU(factory.getConstant(NAME, "pigeonId").intValue());
+        }
+
+        if(mPigeon != null)
+          mPigeon.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10, 10);
 
         setOpenLoop(DriveSignal.NEUTRAL);
 
@@ -229,11 +247,11 @@ public class Drive extends Subsystem {
         return mPeriodicIO.gyro_heading;
     }
 
-    public double getHeadingDegrees(){
+    public double getHeadingDegrees() {
         return getHeading().rotateBy(mGyroOffset).getDegrees();
     }
 
-    public double getDesiredHeading(){
+    public double getDesiredHeading() {
         return mPeriodicIO.path_setpoint.state().getRotation().rotateBy(mGyroOffset).getDegrees();
     }
 
@@ -319,11 +337,11 @@ public class Drive extends Subsystem {
         return mPeriodicIO.right_demand;
     }
 
-    public double getLeftError(){
+    public double getLeftError() {
         return mPeriodicIO.left_error;
     }
 
-    public double getRightError(){
+    public double getRightError() {
         return mPeriodicIO.right_error;
     }
 
@@ -363,11 +381,11 @@ public class Drive extends Subsystem {
     }
 
     private void reloadTalonGains(IMotorControllerEnhanced talon) {
-        talon.config_kP(0, factory.getConstant(NAME,"kP"), Constants.kLongCANTimeoutMs);
-        talon.config_kI(0, factory.getConstant(NAME,"kI"), Constants.kLongCANTimeoutMs);
+        talon.config_kP(0, factory.getConstant(NAME, "kP"), Constants.kLongCANTimeoutMs);
+        talon.config_kI(0, factory.getConstant(NAME, "kI"), Constants.kLongCANTimeoutMs);
         talon.config_kD(0, kD, Constants.kLongCANTimeoutMs);
-        talon.config_kF(0, factory.getConstant(NAME,"kF"), Constants.kLongCANTimeoutMs);
-        talon.config_IntegralZone(0, factory.getConstant(NAME,"iZone").intValue(), Constants.kLongCANTimeoutMs);
+        talon.config_kF(0, factory.getConstant(NAME, "kF"), Constants.kLongCANTimeoutMs);
+        talon.config_IntegralZone(0, factory.getConstant(NAME, "iZone").intValue(), Constants.kLongCANTimeoutMs);
     }
 
     @Override

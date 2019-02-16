@@ -10,7 +10,7 @@ subsystems:
       rightSlaveTwo: -1
     constants:
       pigeonId: 13
-      pigeonOntalon: false
+      pigeonOnTalon: 0
       kP: 4.621542359341748
       kI: 0.016
       kD: 40

@@ -34,13 +34,13 @@ public class Robot extends TimedRobot {
     private final SubsystemManager mSubsystemManager = new SubsystemManager(
             Arrays.asList(
                     RobotStateEstimator.getInstance(),
-                    Drive.getInstance()
-                    /*, CarriageCanifier.getInstance()*/
+                    Drive.getInstance(),
+                    CarriageCanifier.getInstance()
             )
     );
 
     private Drive mDrive = Drive.getInstance();
-    //private LED mLED = LED.getInstance();
+    private LED mLED = LED.getInstance();
 
     private AutoModeExecutor mAutoModeExecutor;
 
@@ -72,8 +72,8 @@ public class Robot extends TimedRobot {
 
             mSubsystemManager.registerEnabledLoops(mEnabledLooper);
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
-            //mLED.registerEnabledLoops(mEnabledLooper);
-            //mLED.registerEnabledLoops(mDisabledLooper);
+            mLED.registerEnabledLoops(mEnabledLooper);
+            mLED.registerEnabledLoops(mDisabledLooper);
             mTrajectoryGenerator.generateTrajectories();
             mAutoModeSelector.updateModeCreator();
             // Set the auto field state at least once.
@@ -103,7 +103,7 @@ public class Robot extends TimedRobot {
             mAutoModeSelector.updateModeCreator();
             mAutoModeExecutor = new AutoModeExecutor();
             mDisabledLooper.start();
-            //mLED.setEnableFaults(true);
+            mLED.setEnableFaults(true);
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -124,7 +124,7 @@ public class Robot extends TimedRobot {
 
             mAutoModeExecutor.start();
 
-            //mLED.setEnableFaults(false);
+            mLED.setEnableFaults(false);
             mEnabledLooper.start();
 
         } catch (Throwable t) {
@@ -146,7 +146,7 @@ public class Robot extends TimedRobot {
             mAutoFieldState.disableOverride();
             RobotState.getInstance().reset(Timer.getFPGATimestamp(), Pose2d.identity());
             mEnabledLooper.start();
-            //mLED.setEnableFaults(false);
+            mLED.setEnableFaults(false);
 
             mDrive.setVelocity(DriveSignal.NEUTRAL, DriveSignal.NEUTRAL);
             mDrive.setOpenLoop(new DriveSignal(0.05, 0.05));
@@ -163,11 +163,11 @@ public class Robot extends TimedRobot {
 
         try {
             System.out.println("Starting check systems.");
-            //mLED.stop();
+            mLED.stop();
             mDisabledLooper.stop();
             mEnabledLooper.stop();
             mDrive.checkSystem();
-            //mLED.checkSystem();
+            mLED.checkSystem();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -217,11 +217,11 @@ public class Robot extends TimedRobot {
 
 
             // LEDs
-            // if (mControlBoard.getWantsCubeLEDBlink()) {
-            //     mLED.setWantedAction(LED.WantedAction.DISPLAY_WANTS_CUBE);
-            // } else {
-            //     mLED.setWantedAction(LED.WantedAction.DISPLAY_INTAKE);
-            // }
+            if (mControlBoard.getWantsCubeLEDBlink()) {
+                mLED.setWantedAction(LED.WantedAction.DISPLAY_WANTS_CUBE);
+            } else {
+                mLED.setWantedAction(LED.WantedAction.DISPLAY_INTAKE);
+            }
 
 
             outputToSmartDashboard();
