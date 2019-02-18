@@ -21,8 +21,8 @@
     <orderEntry type="library" name="Gradle: edu.wpi.first.cscore:cscore-java:2019.2.1" level="project" />
     <orderEntry type="library" name="Gradle: edu.wpi.first.cameraserver:cameraserver-java:2019.2.1" level="project" />
     <orderEntry type="library" name="Gradle: edu.wpi.first.hal:hal-java:2019.2.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.ctre.phoenix:api-java:5.12.1" level="project" />
-    <orderEntry type="library" name="Gradle: com.ctre.phoenix:wpiapi-java:5.12.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.ctre.phoenix:api-java:5.14.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.ctre.phoenix:wpiapi-java:5.14.0" level="project" />
     <orderEntry type="library" name="Gradle: org.reflections:reflections:0.9.11" level="project" />
     <orderEntry type="library" name="Gradle: com.github.dominikwin:badlog:v0.1.1" level="project" />
     <orderEntry type="library" name="Gradle: org.yaml:snakeyaml:1.23" level="project" />
