@@ -50,6 +50,8 @@ public class Robot extends TimedRobot {
 
     public static final RobotFactory factory = new RobotFactory(System.getenv("ROBOT_NAME"));
 
+    private double loopStart;
+
     @Override
     public void robotInit() {
         try {
@@ -66,6 +68,8 @@ public class Robot extends TimedRobot {
             BadLog.createTopic("Drivetrain/RightDistance", "Inches", mDrive::getRightEncoderDistance, "hide", "join:Drivetrain/Distance");
             BadLog.createTopic("Drivetrain/ActualHeading", "Angle", mDrive::getHeadingDegrees, "hide", "join:Drivetrain/Heading");
             BadLog.createTopic("Drivetrain/Heading", "Angle", mDrive::getDesiredHeading, "hide", "join:Drivetrain/Heading");
+            BadLog.createTopic("Timings/Looper", "ms", mEnabledLooper::getLastLoop, "hide", "join:Timings");
+            BadLog.createTopic("Timings/RobotLoop", "ms", this::getLastLoop, "hide", "join:Timings");
             logger.finishInitialization();
 
             CrashTracker.logRobotInit();
@@ -84,7 +88,11 @@ public class Robot extends TimedRobot {
         }
     }
 
-    @Override
+  private Double getLastLoop() {
+    return (Timer.getFPGATimestamp() - loopStart) * 1000;
+  }
+
+  @Override
     public void disabledInit() {
         SmartDashboard.putString("Match Cycle", "DISABLED");
 
@@ -176,9 +184,9 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
+        loopStart = Timer.getFPGATimestamp();
         SmartDashboard.putString("Match Cycle", "DISABLED");
         try {
-            outputToSmartDashboard();
 
             // Poll FMS auto mode info and update mode creator cache
             mAutoFieldState.setSides(DriverStation.getInstance().getGameSpecificMessage());
@@ -192,6 +200,9 @@ public class Robot extends TimedRobot {
                 }
                 //System.gc();
             }
+
+            outputToSmartDashboard();
+
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -200,12 +211,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
+        loopStart = Timer.getFPGATimestamp();
         SmartDashboard.putString("Match Cycle", "AUTONOMOUS");
         outputToSmartDashboard();
     }
 
     @Override
     public void teleopPeriodic() {
+        loopStart = Timer.getFPGATimestamp();
         SmartDashboard.putString("Match Cycle", "TELEOP");
 
         double throttle = mControlBoard.getThrottle();

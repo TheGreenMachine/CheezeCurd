@@ -86,5 +86,10 @@ public class Looper implements ILooper {
     public void outputToSmartDashboard() {
         SmartDashboard.putNumber("looper_dt", dt_);
     }
+
+    public double getLastLoop() {
+      if(!running_) return 0;
+      return dt_ * 1000; // Convert to ms
+    }
 }
 
