@@ -140,6 +140,8 @@ public class Drive extends Subsystem {
             }
             if(master != null) {
                 mPigeon = new PigeonIMU((TalonSRX) master);
+            } else {
+                mPigeon = new PigeonIMU(new TalonSRX(factory.getConstant(NAME, "pigeonId").intValue()));
             }
         } else {
             mPigeon = new PigeonIMU(factory.getConstant(NAME, "pigeonId").intValue());
@@ -257,7 +259,6 @@ public class Drive extends Subsystem {
 
     public synchronized void setHeading(Rotation2d heading) {
         System.out.println("SET HEADING: " + heading.getDegrees());
-
         mGyroOffset = heading.rotateBy(Rotation2d.fromDegrees(mPigeon.getFusedHeading()).inverse());
         System.out.println("Gyro offset: " + mGyroOffset.getDegrees());
 
