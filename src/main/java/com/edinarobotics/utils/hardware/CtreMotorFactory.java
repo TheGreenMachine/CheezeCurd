@@ -7,6 +7,8 @@ import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import frc.team1816.Robot;
+
 /**
  * A class to create TalonSRX, VictorSPX, and GhostTalonSRX objects.
  * Based on FRC Team 254 The Cheesy Poof's 2018 TalonSRXFactory.
@@ -63,16 +65,15 @@ public class CtreMotorFactory {
         return createTalon(id, kDefaultConfiguration);
     }
 
-    public static IMotorControllerEnhanced createPermanentSlaveTalon(int id, int master_id) {
+    public static IMotorControllerEnhanced createPermanentSlaveTalon(int id, IMotorController master) {
         final IMotorControllerEnhanced talon = createTalon(id, kSlaveConfiguration);
-        System.out.println("Slaving talon on " + id + " to talon on " + master_id);
-        talon.set(ControlMode.Follower, master_id);
+        System.out.println("Slaving talon on " + id + " to talon on " + master.getDeviceID());
+        talon.follow(master);
         return talon;
     }
 
     private static IMotorControllerEnhanced createTalon(int id, Configuration config) {
         TalonSRX talon = new TalonSRX(id);
-        talon.configFactoryDefault(kTimeoutMs);
         configureMotorController(talon, config);
 
         talon.configReverseLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
@@ -90,22 +91,23 @@ public class CtreMotorFactory {
                 config.ANALOG_TEMP_VBAT_STATUS_FRAME_RATE_MS, kTimeoutMs);
         talon.setStatusFramePeriod(StatusFrameEnhanced.Status_8_PulseWidth,
                 config.PULSE_WIDTH_STATUS_FRAME_RATE_MS, kTimeoutMs);
+        talon.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 20);
 
         return talon;
     }
 
     public static IMotorControllerEnhanced createGhostTalon() {
-        return new GhostTalonSRX(0);
+        return new GhostTalonSRX();
     }
 
     public static IMotorController createDefaultVictor(int id) {
         return createVictor(id, kDefaultConfiguration);
     }
 
-    public static IMotorController createPermanentSlaveVictor(int id, int masterId) {
+    public static IMotorController createPermanentSlaveVictor(int id, IMotorController master) {
         final IMotorController victor = createVictor(id, kSlaveConfiguration);
-        System.out.println("Slaving victor on " + id + " to talon on " + masterId);
-        victor.set(ControlMode.Follower, masterId);
+        System.out.println("Slaving victor on " + id + " to talon on " + master.getDeviceID());
+        victor.follow(master);
         return victor;
     }
 
@@ -162,8 +164,11 @@ public class CtreMotorFactory {
         motor.overrideSoftLimitsEnable(config.ENABLE_SOFT_LIMIT);
 
         motor.setInverted(config.INVERTED);
-        motor.setSensorPhase(config.SENSOR_PHASE);
-
+        if (Robot.factory.getConstant("sensorPhase") == 1){
+                motor.setSensorPhase(true);
+        } else {
+                motor.setSensorPhase(config.SENSOR_PHASE);
+        }
         motor.selectProfileSlot(0, 0);
 
         ErrorCode code = motor.configVelocityMeasurementPeriod(config.VELOCITY_MEASUREMENT_PERIOD, kTimeoutMs);

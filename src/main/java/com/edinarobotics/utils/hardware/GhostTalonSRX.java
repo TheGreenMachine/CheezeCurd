@@ -7,13 +7,10 @@ import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 
-public class GhostTalonSRX extends BaseMotorController  implements IMotorControllerEnhanced{
+public class GhostTalonSRX implements IMotorControllerEnhanced {
 
-    private SensorCollection sensorCollection = new SensorCollection(this);
-
-    GhostTalonSRX(int arbId) {
-        super(arbId);
-    }
+    private SensorCollection sensorCollection = new SensorCollection(new BaseMotorController(0) {
+    });
 
     @Override
     public void set(ControlMode Mode, double demand) {
@@ -322,6 +319,11 @@ public class GhostTalonSRX extends BaseMotorController  implements IMotorControl
     @Override
     public ErrorCode configMotionAcceleration(int sensorUnitsPer100msPerSec, int timeoutMs) {
         return ErrorCode.OK;
+    }
+
+    @Override
+    public ErrorCode configMotionSCurveStrength(int curveStrength, int timeoutMs) {
+      return ErrorCode.OK;
     }
 
     @Override
