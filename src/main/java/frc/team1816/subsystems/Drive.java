@@ -106,21 +106,19 @@ public class Drive extends Subsystem {
 
         // Start all Talons in open loop mode.
         mLeftMaster = factory.getMotor(NAME, "leftMain");
-        configureMaster(mLeftMaster, true);
 
-        mLeftSlaveA = factory.getMotor(NAME, "leftSlaveOne", "leftMain");
+        mLeftSlaveA = factory.getMotor(NAME, "leftSlaveOne", mLeftMaster);
         mLeftSlaveA.setInverted(false);
 
-        mLeftSlaveB = factory.getMotor(NAME, "leftSlaveTwo", "leftMain");
+        mLeftSlaveB = factory.getMotor(NAME, "leftSlaveTwo", mLeftMaster);
         mLeftSlaveB.setInverted(false);
 
         mRightMaster = factory.getMotor(NAME, "rightMain");
-        configureMaster(mRightMaster, false);
 
-        mRightSlaveA = factory.getMotor(NAME, "rightSlaveOne", "rightMain");
+        mRightSlaveA = factory.getMotor(NAME, "rightSlaveOne", mRightMaster);
         mRightSlaveA.setInverted(true);
 
-        mRightSlaveB = factory.getMotor(NAME, "rightSlaveTwo", "rightMain");
+        mRightSlaveB = factory.getMotor(NAME, "rightSlaveTwo", mRightMaster);
         mRightSlaveB.setInverted(true);
 
         reloadGains();
