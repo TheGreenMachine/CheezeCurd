@@ -91,7 +91,6 @@ public class Drive extends Subsystem {
         if (sensorPresent != ErrorCode.OK) {
             DriverStation.reportError("Could not detect " + (left ? "left" : "right") + " encoder: " + sensorPresent, false);
         }
-        talon.setInverted(left);
         talon.setSensorPhase(true);
         talon.enableVoltageCompensation(true);
         talon.configVoltageCompSaturation(12.0, Constants.kLongCANTimeoutMs);
@@ -108,18 +107,14 @@ public class Drive extends Subsystem {
         mLeftMaster = factory.getMotor(NAME, "leftMain");
 
         mLeftSlaveA = factory.getMotor(NAME, "leftSlaveOne", mLeftMaster);
-        mLeftSlaveA.setInverted(false);
 
         mLeftSlaveB = factory.getMotor(NAME, "leftSlaveTwo", mLeftMaster);
-        mLeftSlaveB.setInverted(false);
 
         mRightMaster = factory.getMotor(NAME, "rightMain");
 
         mRightSlaveA = factory.getMotor(NAME, "rightSlaveOne", mRightMaster);
-        mRightSlaveA.setInverted(true);
 
         mRightSlaveB = factory.getMotor(NAME, "rightSlaveTwo", mRightMaster);
-        mRightSlaveB.setInverted(true);
 
         reloadGains();
 
@@ -456,8 +451,8 @@ public class Drive extends Subsystem {
     private CheckerConfig getTalonCheckerConfig(IMotorControllerEnhanced talon) {
         return new CheckerConfig() {
             {
-                mCurrentFloor = .1;
-                mRPMFloor = 160;
+                mCurrentFloor = .4;
+                mRPMFloor = 850;
                 mCurrentEpsilon = .2;
                 mRPMEpsilon = 20;
                 mRPMSupplier = () -> talon.getSelectedSensorVelocity(0);
@@ -507,4 +502,3 @@ public class Drive extends Subsystem {
         TimedState<Pose2dWithCurvature> path_setpoint = new TimedState<>(Pose2dWithCurvature.identity());
     }
 }
-
