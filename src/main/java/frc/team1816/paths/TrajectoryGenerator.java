@@ -62,7 +62,7 @@ public class TrajectoryGenerator {
 
     // STARTING IN CENTER
     private static final Pose2d kCenterStartPose = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(180.0));
-    private static final Pose2d kCenterStraightPose = new Pose2d(15, 0.0, Rotation2d.fromDegrees(180.0));
+    private static final Pose2d kCenterStraightPose = new Pose2d(72, 0.0, Rotation2d.fromDegrees(180.0));
 
     public class TrajectorySet {
 
@@ -118,4 +118,3 @@ public class TrajectoryGenerator {
         }
     }
 }
-

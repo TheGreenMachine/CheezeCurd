@@ -451,10 +451,10 @@ public class Drive extends Subsystem {
     private CheckerConfig getTalonCheckerConfig(IMotorControllerEnhanced talon) {
         return new CheckerConfig() {
             {
-                mCurrentFloor = .4;
-                mRPMFloor = 850;
-                mCurrentEpsilon = .2;
-                mRPMEpsilon = 20;
+                mCurrentFloor = factory.getConstant(NAME,"currentFloorCheck");
+                mRPMFloor = factory.getConstant(NAME,"rpmFloorCheck");
+                mCurrentEpsilon = factory.getConstant(NAME,"currentEpsilonCheck");
+                mRPMEpsilon = factory.getConstant(NAME,"rpmEpsilonCheck");
                 mRPMSupplier = () -> talon.getSelectedSensorVelocity(0);
             }
         };

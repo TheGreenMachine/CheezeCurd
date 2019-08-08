@@ -26,7 +26,7 @@ public class RobotFactory {
       YamlConfig.SubsystemConfig subsystem = getSubsystem(subsystemName);
       if (isHardwareValid(subsystem.talons.get(name))) {
         var motor = CtreMotorFactory.createDefaultTalon(subsystem.talons.get(name));
-        if(subsystem.constants.get("invertMotor").intValue() == motor.getDeviceID()) {
+        if (subsystem.constants.get("invertMotor").intValue() == motor.getDeviceID()) {
           System.out.println("Inverting " + name);
           motor.setInverted(true);
         }
@@ -41,10 +41,14 @@ public class RobotFactory {
       YamlConfig.SubsystemConfig subsystem = getSubsystem(subsystemName);
       if (isHardwareValid(subsystem.talons.get(name))) {
         // Talons must be following another Talon, cannot follow a Victor.
-        return CtreMotorFactory.createPermanentSlaveTalon(subsystem.talons.get(name), master);
+        var talon = CtreMotorFactory.createPermanentSlaveTalon(subsystem.talons.get(name), master);
+        talon.setInverted(master.getInverted());
+        return talon;
       } else if (isHardwareValid(subsystem.victors.get(name))) {
         // Victors can follow Talons or another Victor.
-        return CtreMotorFactory.createPermanentSlaveVictor(subsystem.victors.get(name), master);
+        var victor = CtreMotorFactory.createPermanentSlaveVictor(subsystem.victors.get(name), master);
+        victor.setInverted(master.getInverted());
+        return victor;
       }
     }
     return CtreMotorFactory.createGhostTalon();
