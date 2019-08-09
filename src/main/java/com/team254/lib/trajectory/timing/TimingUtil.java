@@ -17,6 +17,7 @@ public class TimingUtil {
             double end_velocity,
             double max_velocity,
             double max_abs_acceleration) {
+      System.out.println("################ IN TIMING UTIL: max_velocity: " + max_velocity + ", max_abs_acceleration: " + max_abs_acceleration);
         final int num_states = (int) Math.ceil(distance_view.last_interpolant() / step_size + 1);
         List<S> states = new ArrayList<>(num_states);
         for (int i = 0; i < num_states; ++i) {
@@ -220,7 +221,8 @@ public class TimingUtil {
             s = constrained_state.distance;
             timed_states.add(new TimedState<>(constrained_state.state, t, reverse ? -v : v, reverse ? -accel : accel));
         }
-        return new Trajectory<>(timed_states);
+      System.out.println("##################### END OF timeParameterizeTrajectory: velocity: " + max_velocity + ", max_abs_acceleration: " + max_abs_acceleration);
+      return new Trajectory<>(timed_states);
     }
 
     protected static class ConstrainedState<S extends State<S>> {

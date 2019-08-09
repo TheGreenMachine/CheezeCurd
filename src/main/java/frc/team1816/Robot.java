@@ -14,7 +14,10 @@ import frc.team1816.auto.AutoModeBase;
 import frc.team1816.auto.AutoModeExecutor;
 import frc.team1816.loops.Looper;
 import frc.team1816.paths.TrajectoryGenerator;
-import frc.team1816.subsystems.*;
+import frc.team1816.subsystems.CarriageCanifier;
+import frc.team1816.subsystems.Drive;
+import frc.team1816.subsystems.LED;
+import frc.team1816.subsystems.RobotStateEstimator;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;

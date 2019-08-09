@@ -173,7 +173,7 @@ public class Drive extends Subsystem {
     /**
      * Configure talons for open loop control
      */
-    public synchronized void setOpenLoop(DriveSignal signal) {
+    public synchronized void setOpenLoop(DriveSignal  signal) {
         if (mDriveControlState != DriveControlState.OPEN_LOOP) {
             setBrakeMode(false);
             System.out.println("Switching to open loop");

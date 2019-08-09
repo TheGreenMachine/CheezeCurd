@@ -48,7 +48,7 @@ public class TrajectoryGenerator {
 
     // CRITICAL POSES
     // Origin is the center of the robot when the robot is placed against the middle of the alliance station wall.
-    // +x is towards the center of the field.
+    // -x is towards the center of the field.
     // +y is to the left.
     // ALL POSES DEFINED FOR THE CASE THAT ROBOT STARTS ON RIGHT! (mirrored about +x axis for LEFT)
 
@@ -62,7 +62,7 @@ public class TrajectoryGenerator {
 
     // STARTING IN CENTER
     private static final Pose2d kCenterStartPose = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(180.0));
-    private static final Pose2d kCenterStraightPose = new Pose2d(72, 0.0, Rotation2d.fromDegrees(180.0));
+    private static final Pose2d kCenterStraightPose = new Pose2d(-72, 0.0, Rotation2d.fromDegrees(180.0));
 
     public class TrajectorySet {
 
@@ -88,13 +88,14 @@ public class TrajectoryGenerator {
             centerStartToStairs = getCenterStartToStairs();
             centerStartToVex = getCenterStartToVex();
             centerPID = getPID();
+            System.out.println(centerPID.toString());
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getPID() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(kCenterStartPose);
             waypoints.add(kCenterStraightPose);
-            return mMotionPlanner.generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
+            return mMotionPlanner.generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
                     kMaxVelocity, kMaxAccel, kMaxVoltage);
         }
 

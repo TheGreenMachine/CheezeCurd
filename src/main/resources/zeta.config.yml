@@ -15,9 +15,9 @@ subsystems:
       kP: 0
       kI: 0
       kD: 0
-      kF: .93
+      kF: .1279
       iZone: 0
-      encPPR: 960
+      encPPR: 1015.3333333333
       invertMotor: 1
       currentFloorCheck: .5
       currentEpsilonCheck: .2
@@ -31,6 +31,6 @@ subsystems:
 constants:
   wheelDiameter: 3.92820959548
   trackWidth: 25
-  maxVel: 25
-  maxAccel: 50
+  maxVel: 90 #inch/s
+  maxAccel: 50 #inch/s^2
   sensorPhase: 0
