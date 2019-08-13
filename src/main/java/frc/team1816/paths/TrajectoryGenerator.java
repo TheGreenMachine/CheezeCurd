@@ -7,18 +7,17 @@ import com.team254.lib.trajectory.Trajectory;
 import com.team254.lib.trajectory.TrajectoryUtil;
 import com.team254.lib.trajectory.timing.CentripetalAccelerationConstraint;
 import com.team254.lib.trajectory.timing.TimedState;
+import frc.team1816.Robot;
 import frc.team1816.planners.DriveMotionPlanner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static frc.team1816.Robot.factory;
-
 public class TrajectoryGenerator {
     // velocities are in/sec
-    private static final double kMaxVelocity = factory.getConstant("maxVel");
-    private static final double kMaxAccel = factory.getConstant("maxAccel");
+    private static final double kMaxVelocity = Robot.getFactory().getConstant("maxVel");
+    private static final double kMaxAccel = Robot.getFactory().getConstant("maxAccel");
     private static final double kMaxCentripetalAccel = 100.0;
     private static final double kMaxVoltage = 9.0;
 

@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team1816.Constants;
+import frc.team1816.Robot;
 import frc.team1816.RobotState;
 import frc.team1816.loops.ILooper;
 import frc.team1816.loops.Loop;
@@ -25,12 +26,10 @@ import frc.team1816.planners.DriveMotionPlanner;
 
 import java.util.ArrayList;
 
-import static frc.team1816.Robot.factory;
-
 public class Drive extends Subsystem {
 
     private static final String NAME = "drivetrain";
-    private static final double DRIVE_ENCODER_PPR = factory.getConstant(NAME, "encPPR");
+    private static final double DRIVE_ENCODER_PPR = Robot.getFactory().getConstant(NAME, "encPPR");
     private static Drive mInstance = new Drive();
     // Hardware
     private final IMotorControllerEnhanced mLeftMaster;
@@ -49,7 +48,7 @@ public class Drive extends Subsystem {
     private DriveMotionPlanner mMotionPlanner;
     private Rotation2d mGyroOffset = Rotation2d.identity();
     private boolean mOverrideTrajectory = false;
-    private static double kD = factory.getConstant(NAME, "kD");
+    private static double kD = Robot.getFactory().getConstant(NAME, "kD");
 
     private final Loop mLoop = new Loop() {
         @Override
@@ -104,22 +103,22 @@ public class Drive extends Subsystem {
         mPeriodicIO = new PeriodicIO();
 
         // Start all Talons in open loop mode.
-        mLeftMaster = factory.getMotor(NAME, "leftMain");
+        mLeftMaster = Robot.getFactory().getMotor(NAME, "leftMain");
 
-        mLeftSlaveA = factory.getMotor(NAME, "leftSlaveOne", mLeftMaster);
+        mLeftSlaveA = Robot.getFactory().getMotor(NAME, "leftSlaveOne", mLeftMaster);
 
-        mLeftSlaveB = factory.getMotor(NAME, "leftSlaveTwo", mLeftMaster);
+        mLeftSlaveB = Robot.getFactory().getMotor(NAME, "leftSlaveTwo", mLeftMaster);
 
-        mRightMaster = factory.getMotor(NAME, "rightMain");
+        mRightMaster = Robot.getFactory().getMotor(NAME, "rightMain");
 
-        mRightSlaveA = factory.getMotor(NAME, "rightSlaveOne", mRightMaster);
+        mRightSlaveA = Robot.getFactory().getMotor(NAME, "rightSlaveOne", mRightMaster);
 
-        mRightSlaveB = factory.getMotor(NAME, "rightSlaveTwo", mRightMaster);
+        mRightSlaveB = Robot.getFactory().getMotor(NAME, "rightSlaveTwo", mRightMaster);
 
         reloadGains();
 
-        if (factory.getConstant(NAME, "pigeonOnTalon").intValue() == 1) {
-            var pigeonId = factory.getConstant(NAME, "pigeonId").intValue();
+        if (Robot.getFactory().getConstant(NAME, "pigeonOnTalon").intValue() == 1) {
+            var pigeonId = Robot.getFactory().getConstant(NAME, "pigeonId").intValue();
             System.out.println("Pigeon on Talon " + pigeonId);
             IMotorController master = null;
             if (mLeftSlaveA.getDeviceID() == pigeonId) {
@@ -134,10 +133,10 @@ public class Drive extends Subsystem {
             if(master != null) {
                 mPigeon = new PigeonIMU((TalonSRX) master);
             } else {
-                mPigeon = new PigeonIMU(new TalonSRX(factory.getConstant(NAME, "pigeonId").intValue()));
+                mPigeon = new PigeonIMU(new TalonSRX(Robot.getFactory().getConstant(NAME, "pigeonId").intValue()));
             }
         } else {
-            mPigeon = new PigeonIMU(factory.getConstant(NAME, "pigeonId").intValue());
+            mPigeon = new PigeonIMU(Robot.getFactory().getConstant(NAME, "pigeonId").intValue());
         }
 
         if(mPigeon != null)
@@ -375,11 +374,11 @@ public class Drive extends Subsystem {
     }
 
     private void reloadTalonGains(IMotorControllerEnhanced talon) {
-        talon.config_kP(0, factory.getConstant(NAME, "kP"), Constants.kLongCANTimeoutMs);
-        talon.config_kI(0, factory.getConstant(NAME, "kI"), Constants.kLongCANTimeoutMs);
+        talon.config_kP(0, Robot.getFactory().getConstant(NAME, "kP"), Constants.kLongCANTimeoutMs);
+        talon.config_kI(0, Robot.getFactory().getConstant(NAME, "kI"), Constants.kLongCANTimeoutMs);
         talon.config_kD(0, kD, Constants.kLongCANTimeoutMs);
-        talon.config_kF(0, factory.getConstant(NAME, "kF"), Constants.kLongCANTimeoutMs);
-        talon.config_IntegralZone(0, factory.getConstant(NAME, "iZone").intValue(), Constants.kLongCANTimeoutMs);
+        talon.config_kF(0, Robot.getFactory().getConstant(NAME, "kF"), Constants.kLongCANTimeoutMs);
+        talon.config_IntegralZone(0, Robot.getFactory().getConstant(NAME, "iZone").intValue(), Constants.kLongCANTimeoutMs);
     }
 
     @Override
@@ -451,10 +450,10 @@ public class Drive extends Subsystem {
     private CheckerConfig getTalonCheckerConfig(IMotorControllerEnhanced talon) {
         return new CheckerConfig() {
             {
-                mCurrentFloor = factory.getConstant(NAME,"currentFloorCheck");
-                mRPMFloor = factory.getConstant(NAME,"rpmFloorCheck");
-                mCurrentEpsilon = factory.getConstant(NAME,"currentEpsilonCheck");
-                mRPMEpsilon = factory.getConstant(NAME,"rpmEpsilonCheck");
+                mCurrentFloor = Robot.getFactory().getConstant(NAME,"currentFloorCheck");
+                mRPMFloor = Robot.getFactory().getConstant(NAME,"rpmFloorCheck");
+                mCurrentEpsilon = Robot.getFactory().getConstant(NAME,"currentEpsilonCheck");
+                mRPMEpsilon = Robot.getFactory().getConstant(NAME,"rpmEpsilonCheck");
                 mRPMSupplier = () -> talon.getSelectedSensorVelocity(0);
             }
         };

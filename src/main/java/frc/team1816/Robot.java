@@ -46,7 +46,16 @@ public class Robot extends TimedRobot {
     CrashTracker.logRobotConstruction();
   }
 
-  public static final RobotFactory factory = new RobotFactory(System.getenv("ROBOT_NAME"));
+  private static RobotFactory factory;
+
+  public static RobotFactory getFactory(){
+    if(factory == null) {
+      var robotName = System.getenv("ROBOT_NAME");
+      if (robotName == null) robotName = "default";
+      factory = new RobotFactory(robotName);
+    }
+    return factory;
+  }
 
   private double loopStart;
 

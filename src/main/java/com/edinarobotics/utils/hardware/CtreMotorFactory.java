@@ -11,7 +11,7 @@ import frc.team1816.Robot;
 
 /**
  * A class to create TalonSRX, VictorSPX, and GhostTalonSRX objects.
- * Based on FRC Team 254 The Cheesy Poof's 2018 TalonSRXFactory.
+ * Based on FRC Team 254 The Cheesy Poof's 2018 TalonSRXFactory
  */
 public class CtreMotorFactory {
     private final static int kTimeoutMs = 100;
@@ -164,7 +164,7 @@ public class CtreMotorFactory {
         motor.overrideSoftLimitsEnable(config.ENABLE_SOFT_LIMIT);
 
         motor.setInverted(config.INVERTED);
-        if (Robot.factory.getConstant("sensorPhase") == 1){
+        if (Robot.getFactory().getConstant("sensorPhase") == 1){
                 motor.setSensorPhase(true);
         } else {
                 motor.setSensorPhase(config.SENSOR_PHASE);

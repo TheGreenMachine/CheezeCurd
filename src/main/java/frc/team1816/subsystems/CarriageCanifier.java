@@ -3,8 +3,7 @@ package frc.team1816.subsystems;
 import com.ctre.phoenix.CANifier;
 import com.ctre.phoenix.CANifierStatusFrame;
 import frc.team1816.Constants;
-
-import static frc.team1816.Robot.factory;
+import frc.team1816.Robot;
 
 public class CarriageCanifier extends Subsystem {
     private static final String NAME = "canifier";
@@ -15,7 +14,7 @@ public class CarriageCanifier extends Subsystem {
     private boolean mOutputsChanged;
 
     private CarriageCanifier() {
-        mCanifier = new CANifier(factory.getConstant(NAME,"canId").intValue());
+        mCanifier = new CANifier(Robot.getFactory().getConstant(NAME,"canId").intValue());
         if(mCanifier.getDeviceID() >= 0) {
             mCanifier.setStatusFramePeriod(CANifierStatusFrame.Status_1_General, 100, Constants.kLongCANTimeoutMs);
             mCanifier.setStatusFramePeriod(CANifierStatusFrame.Status_2_General, 2, Constants.kLongCANTimeoutMs);
