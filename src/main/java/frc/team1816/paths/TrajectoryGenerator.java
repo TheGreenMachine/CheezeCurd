@@ -56,7 +56,7 @@ public class TrajectoryGenerator {
     private static final Pose2d kShop2 = new Pose2d(-114,-126,Rotation2d.fromDegrees(180-22));
     private static final Pose2d kVexBox = new Pose2d(-198,-150,Rotation2d.fromDegrees(180));
 
-    private static final Pose2d kMiddleWalkway = new Pose2d(-79.5,11.0,Rotation2d.fromDegrees(180-45));
+    private static final Pose2d kMiddleWalkway = new Pose2d(-79.5,11.0,Rotation2d.fromDegrees(180+45));
     private static final Pose2d kStairs = new Pose2d(-176,36,Rotation2d.fromDegrees(180));
 
     // STARTING IN CENTER
@@ -103,7 +103,7 @@ public class TrajectoryGenerator {
             waypoints.add(kCenterStartPose);
             waypoints.add(kMiddleWalkway);
             waypoints.add(kStairs);
-            return mMotionPlanner.generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
+            return mMotionPlanner.generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
                     kMaxVelocity, kMaxAccel, kMaxVoltage);
         }
 
@@ -113,7 +113,7 @@ public class TrajectoryGenerator {
             waypoints.add(kShop1);
             waypoints.add(kShop2);
             waypoints.add(kVexBox);
-            return mMotionPlanner.generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
+            return mMotionPlanner.generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
                     kMaxVelocity, kMaxAccel, kMaxVoltage);
         }
     }
