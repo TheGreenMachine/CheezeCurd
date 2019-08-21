@@ -1,7 +1,5 @@
 package frc.team1816;
 
-import static frc.team1816.Robot.factory;
-
 /**
  * A list of constants used by the rest of the robot code. This include physics constants as well as constants
  * determined through calibrations.
@@ -12,8 +10,8 @@ public class Constants {
     /* ROBOT PHYSICAL CONSTANTS */
 
     // Wheels
-    public static final double kDriveWheelTrackWidthInches = factory.getConstant("trackWidth");
-    public static final double kDriveWheelDiameterInches = factory.getConstant("wheelDiameter");
+    public static final double kDriveWheelTrackWidthInches = Robot.getFactory().getConstant("trackWidth");
+    public static final double kDriveWheelDiameterInches = Robot.getFactory().getConstant("wheelDiameter");
     public static final double kDriveWheelRadiusInches = kDriveWheelDiameterInches / 2.0;
     public static final double kTrackScrubFactor = 1.0;  // Tune me!
 

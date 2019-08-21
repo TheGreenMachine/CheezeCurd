@@ -39,4 +39,3 @@ public class AutoModeExecutor {
         return m_auto_mode;
     }
 }
-

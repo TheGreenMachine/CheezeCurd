@@ -11,20 +11,26 @@ subsystems:
     constants:
       pigeonId: 3
       pigeonOnTalon: 1
-      kP: 5.0
+      kP: .19
       kI: 0
-      kD: 1.0
-      kF: 0
+      kD: 0
+      kF: .01548
       iZone: 0
-      encPPR: 4096
+      encPPR: 9752
       maxPos: 1475
       minPos: 915
+      invertMotor: 2
+      currentFloorCheck: 1.2
+      currentEpsilonCheck: .2
+      rpmFloorCheck: 4100
+      rpmEpsilonCheck: 60
   canifier:
     implemented: false
     constants:
-      canId: 12
+      canId: -1
 constants:
-  wheelDiameter: 7.25
+  wheelDiameter: 7.5
   trackWidth: 21.75
-  maxVel: 25
-  maxAccel: 75
+  maxVel: 50 #inch/s robot max is 223
+  maxAccel: 100 #inch/s^2
+  sensorPhase: 0

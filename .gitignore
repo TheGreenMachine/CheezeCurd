@@ -32,3 +32,4 @@ ignored)
 /.idea/libraries
 /trajectories/*_detailed.csv
 /out
+.idea/checkstyle-idea.xml

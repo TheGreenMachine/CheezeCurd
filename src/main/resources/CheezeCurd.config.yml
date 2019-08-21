@@ -2,21 +2,22 @@ subsystems:
   drivetrain:
     implemented: true
     talons:
-      leftMain: 1
+      leftMain: 2
       leftSlaveOne: -1
       leftSlaveTwo: -1
-      rightMain: 2
+      rightMain: 1
       rightSlaveOne: -1
       rightSlaveTwo: -1
     constants:
       pigeonId: 13
       pigeonOnTalon: 0
-      kP: 4.621542359341748
-      kI: 0.016
-      kD: 40
-      kF: 1.70
-      iZone: 28.884639745885927
-      encPPR: 960
+      kP: 0
+      kI: 0
+      kD: 0
+      kF: .2660
+      iZone: 0
+      encPPR: 4096 # CTRE mag encoder
+      invertMotor: 2
   canifier:
     implemented: true
     constants:
@@ -24,5 +25,6 @@ subsystems:
 constants:
   wheelDiameter: 3.92820959548
   trackWidth: 15.75
-  maxVel: 25
-  maxAccel: 75
+  maxVel: 50
+  maxAccel: 90
+  sensorPhase: 0

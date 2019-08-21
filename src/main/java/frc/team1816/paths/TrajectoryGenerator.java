@@ -7,18 +7,17 @@ import com.team254.lib.trajectory.Trajectory;
 import com.team254.lib.trajectory.TrajectoryUtil;
 import com.team254.lib.trajectory.timing.CentripetalAccelerationConstraint;
 import com.team254.lib.trajectory.timing.TimedState;
+import frc.team1816.Robot;
 import frc.team1816.planners.DriveMotionPlanner;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static frc.team1816.Robot.factory;
-
 public class TrajectoryGenerator {
     // velocities are in/sec
-    private static final double kMaxVelocity = factory.getConstant("maxVel");
-    private static final double kMaxAccel = factory.getConstant("maxAccel");
+    private static final double kMaxVelocity = Robot.getFactory().getConstant("maxVel");
+    private static final double kMaxAccel = Robot.getFactory().getConstant("maxAccel");
     private static final double kMaxCentripetalAccel = 100.0;
     private static final double kMaxVoltage = 9.0;
 
@@ -48,21 +47,21 @@ public class TrajectoryGenerator {
 
     // CRITICAL POSES
     // Origin is the center of the robot when the robot is placed against the middle of the alliance station wall.
-    // +x is towards the center of the field.
+    // -x is towards the center of the field.
     // +y is to the left.
     // ALL POSES DEFINED FOR THE CASE THAT ROBOT STARTS ON RIGHT! (mirrored about +x axis for LEFT)
 
     // shop
-    private static final Pose2d kShop1 = new Pose2d(74,-36,Rotation2d.fromDegrees(180-45));
-    private static final Pose2d kShop2 = new Pose2d(114,-126,Rotation2d.fromDegrees(180-22));
-    private static final Pose2d kVexBox = new Pose2d(198,-150,Rotation2d.fromDegrees(180));
+    private static final Pose2d kShop1 = new Pose2d(-74,-36,Rotation2d.fromDegrees(180-45));
+    private static final Pose2d kShop2 = new Pose2d(-114,-126,Rotation2d.fromDegrees(180-22));
+    private static final Pose2d kVexBox = new Pose2d(-198,-150,Rotation2d.fromDegrees(180));
 
-    private static final Pose2d kMiddleWalkway = new Pose2d(79.5,11.0,Rotation2d.fromDegrees(180+45));
-    private static final Pose2d kStairs = new Pose2d(176,36,Rotation2d.fromDegrees(180));
+    private static final Pose2d kMiddleWalkway = new Pose2d(-79.5,11.0,Rotation2d.fromDegrees(180+45));
+    private static final Pose2d kStairs = new Pose2d(-176,36,Rotation2d.fromDegrees(180));
 
     // STARTING IN CENTER
     private static final Pose2d kCenterStartPose = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(180.0));
-    private static final Pose2d kCenterStraightPose = new Pose2d(15, 0.0, Rotation2d.fromDegrees(180.0));
+    private static final Pose2d kCenterStraightPose = new Pose2d(-144, 0.0, Rotation2d.fromDegrees(180.0));
 
     public class TrajectorySet {
 
@@ -88,13 +87,14 @@ public class TrajectoryGenerator {
             centerStartToStairs = getCenterStartToStairs();
             centerStartToVex = getCenterStartToVex();
             centerPID = getPID();
+            System.out.println(centerPID.toString());
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getPID() {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(kCenterStartPose);
             waypoints.add(kCenterStraightPose);
-            return mMotionPlanner.generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
+            return mMotionPlanner.generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
                     kMaxVelocity, kMaxAccel, kMaxVoltage);
         }
 
@@ -103,7 +103,7 @@ public class TrajectoryGenerator {
             waypoints.add(kCenterStartPose);
             waypoints.add(kMiddleWalkway);
             waypoints.add(kStairs);
-            return mMotionPlanner.generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
+            return mMotionPlanner.generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
                     kMaxVelocity, kMaxAccel, kMaxVoltage);
         }
 
@@ -113,9 +113,8 @@ public class TrajectoryGenerator {
             waypoints.add(kShop1);
             waypoints.add(kShop2);
             waypoints.add(kVexBox);
-            return mMotionPlanner.generateTrajectory(true, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
+            return mMotionPlanner.generateTrajectory(false, waypoints, Arrays.asList(new CentripetalAccelerationConstraint(kMaxCentripetalAccel)),
                     kMaxVelocity, kMaxAccel, kMaxVoltage);
         }
     }
 }
-
