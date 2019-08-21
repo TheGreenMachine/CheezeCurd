@@ -52,16 +52,16 @@ public class TrajectoryGenerator {
     // ALL POSES DEFINED FOR THE CASE THAT ROBOT STARTS ON RIGHT! (mirrored about +x axis for LEFT)
 
     // shop
-    private static final Pose2d kShop1 = new Pose2d(74,-36,Rotation2d.fromDegrees(180-45));
-    private static final Pose2d kShop2 = new Pose2d(114,-126,Rotation2d.fromDegrees(180-22));
-    private static final Pose2d kVexBox = new Pose2d(198,-150,Rotation2d.fromDegrees(180));
+    private static final Pose2d kShop1 = new Pose2d(-74,-36,Rotation2d.fromDegrees(180-45));
+    private static final Pose2d kShop2 = new Pose2d(-114,-126,Rotation2d.fromDegrees(180-22));
+    private static final Pose2d kVexBox = new Pose2d(-198,-150,Rotation2d.fromDegrees(180));
 
-    private static final Pose2d kMiddleWalkway = new Pose2d(79.5,11.0,Rotation2d.fromDegrees(180+45));
-    private static final Pose2d kStairs = new Pose2d(176,36,Rotation2d.fromDegrees(180));
+    private static final Pose2d kMiddleWalkway = new Pose2d(-79.5,11.0,Rotation2d.fromDegrees(180-45));
+    private static final Pose2d kStairs = new Pose2d(-176,36,Rotation2d.fromDegrees(180));
 
     // STARTING IN CENTER
     private static final Pose2d kCenterStartPose = new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(180.0));
-    private static final Pose2d kCenterStraightPose = new Pose2d(-72, 0.0, Rotation2d.fromDegrees(180.0));
+    private static final Pose2d kCenterStraightPose = new Pose2d(-144, 0.0, Rotation2d.fromDegrees(180.0));
 
     public class TrajectorySet {
 

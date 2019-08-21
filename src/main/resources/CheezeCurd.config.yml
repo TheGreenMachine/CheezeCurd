@@ -14,9 +14,9 @@ subsystems:
       kP: 0
       kI: 0
       kD: 0
-      kF: 1.70
-      iZone: 28.884639745885927
-      encPPR: 960
+      kF: .2660
+      iZone: 0
+      encPPR: 4096 # CTRE mag encoder
       invertMotor: 2
   canifier:
     implemented: true
@@ -25,6 +25,6 @@ subsystems:
 constants:
   wheelDiameter: 3.92820959548
   trackWidth: 15.75
-  maxVel: 25
-  maxAccel: 75
+  maxVel: 50
+  maxAccel: 90
   sensorPhase: 0
